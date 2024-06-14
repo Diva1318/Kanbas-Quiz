@@ -1,0 +1,5 @@
+#wd-modules > .wd-module .list-group-item{
+  background-color: white;
+  border-left: 3px solid green !important;
+}
+

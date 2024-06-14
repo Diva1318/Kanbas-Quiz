@@ -1,0 +1,26 @@
+.percentage-badge {
+
+  border-radius: 25px;
+
+  font-size: 1rem;
+  color: #333;
+  border: 0.25px solid ligth-gray;
+  
+  
+}
+
+.icon-color {
+  color: green; 
+}
+
+.wd-assignment-link {
+  font-weight: bold;
+  color: black; 
+  text-decoration: none; 
+}
+
+#wd-assignment-list .wd-assignment-list-item{
+  background-color: white;
+  border-left: 3px solid green !important;
+}
+
