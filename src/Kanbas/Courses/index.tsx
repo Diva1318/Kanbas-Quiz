@@ -6,6 +6,7 @@ import Grades from './Grades'
 import Assignments from './Assignments'
 import AssignmentEditor from './Assignments/Editor'
 import { FaAlignJustify } from 'react-icons/fa6'
+import Quizzes from './Quizzes'
 
 export default function Courses ({ courses }: { courses: any[] }) {
   const { cid } = useParams()
@@ -34,7 +35,7 @@ export default function Courses ({ courses }: { courses: any[] }) {
             <Route path='/Zoom' element={<h1>Zoom</h1>} />
             <Route path='Assignments' element={<Assignments />} />
             <Route path='Assignments/:aid' element={<AssignmentEditor />} />
-            <Route path='/Quizzes' element={<h1>Quizzes</h1>} />
+            <Route path='/Quizzes' element={<Quizzes />} />
             <Route path='/Grades' element={<Grades />} />
           </Routes>
         </div>

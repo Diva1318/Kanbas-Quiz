@@ -1,26 +1,19 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React from 'react'
+import Kanbas from './Kanbas'
+import { Navigate, HashRouter, Routes, Route } from 'react-router-dom'
+import './index.css'
 
-function App() {
+function App () {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+    <HashRouter>
+      <div className='h-100'>
+        <Routes>
+          <Route path='/' element={<Navigate to='Kanbas' />} />
+          <Route path='/Kanbas/*' element={<Kanbas />} />
+        </Routes>
+      </div>
+    </HashRouter>
+  )
 }
 
-export default App;
+export default App
