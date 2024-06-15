@@ -7,17 +7,23 @@ import Assignments from './Assignments'
 import AssignmentEditor from './Assignments/Editor'
 import { FaAlignJustify } from 'react-icons/fa6'
 import Quizzes from './Quizzes'
+import QuizEditor from './Quizzes/QuizEditor'
+import QuizDetailsEditor from './Quizzes/QuizEditor/QuizDetailsEditor'
+import QuizQuestionEditor from './Quizzes/QuizEditor/QuestionsEditor'
+import QuizEditorTOC from './Quizzes/QuizEditorTOC'
 
 export default function Courses ({ courses }: { courses: any[] }) {
-  const { cid } = useParams()
+  const { cid, qid } = useParams()
   const course = courses.find(course => course._id === cid)
+  // const quiz = course?.quizzes.find((quiz: any) => quiz._id === qid)
   const { pathname } = useLocation()
-
   return (
     <div id='wd-courses'>
       <h2 className='text-danger'>
         <FaAlignJustify className='me-4 fs-4 mb-1' />
         {course && course.name} &gt; {pathname.split('/')[4]}
+        {/*  &gt;{' '}
+        {quiz && quiz.name}{' '} */}
       </h2>
 
       <hr />
@@ -33,9 +39,10 @@ export default function Courses ({ courses }: { courses: any[] }) {
             <Route path='/Modules' element={<Modules />} />
             <Route path='/Piazza' element={<h1>Piazza</h1>} />
             <Route path='/Zoom' element={<h1>Zoom</h1>} />
-            <Route path='Assignments' element={<Assignments />} />
-            <Route path='Assignments/:aid' element={<AssignmentEditor />} />
+            <Route path='/Assignments' element={<Assignments />} />
+            <Route path='/Assignments/:aid' element={<AssignmentEditor />} />
             <Route path='/Quizzes' element={<Quizzes />} />
+            <Route path='/Quizzes/*' element={<QuizEditorTOC />} />
             <Route path='/Grades' element={<Grades />} />
           </Routes>
         </div>
