@@ -4,6 +4,7 @@ import { IoIosRocket } from 'react-icons/io'
 import { IoEllipsisVertical } from 'react-icons/io5'
 import { VscNotebook } from 'react-icons/vsc'
 import { Link } from 'react-router-dom'
+import QuizDetailsEditor from './QuizEditor/QuizDetailsEditor'
 import './style.css'
 
 const defaultDate = new Date().toISOString().split('T')[0]

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import './style.css' // Import a CSS file for styling
+import 'bootstrap/dist/css/bootstrap.min.css' // Ensure Bootstrap is imported
 
 // Define types for question and answers
 interface Question {
@@ -61,53 +61,50 @@ const QuizPreview: React.FC = () => {
   }
 
   return (
-    <div className='quiz-preview'>
+    <div className='container mt-5'>
       <h1>Q1 - HTML</h1>
-      <div className='quiz-info'>
-        <p>This is a preview of the published version of the quiz</p>
+      <div className='alert alert-info' role='alert'>
+        This is a preview of the published version of the quiz
       </div>
       <h2>Quiz Instructions</h2>
-      <div className='card'>
-        {questions.map((question, index) => (
-          <div key={question.id}>
-            <div className='card-header'>
-              <h3>Question {index + 1}</h3>
-              <span>1 pts</span>
-            </div>
-            <div className='card-body'>
-              <p>{question.text}</p>
-              <div className='options'>
-                {question.options.map(option => (
-                  <label key={option} className='option'>
-                    <input
-                      type='radio'
-                      name={`question-${question.id}`}
-                      value={option}
-                      checked={answers[question.id] === option}
-                      onChange={() => handleAnswerChange(question.id, option)}
-                    />
-                    {option}
-                  </label>
-                ))}
-              </div>
-              <button className='float-end btn btn-primary'>Next</button>
+      {questions.map((question, index) => (
+        <div key={question.id} className='card mb-3'>
+          <div className='card-header d-flex justify-content-between'>
+            <h3>Question {index + 1}</h3>
+            <span>1 pts</span>
+          </div>
+          <div className='card-body'>
+            <p>{question.text}</p>
+            <div className='list-group'>
+              {question.options.map(option => (
+                <label
+                  key={option}
+                  className='list-group-item d-flex align-items-center'
+                >
+                  <input
+                    type='radio'
+                    name={`question-${question.id}`}
+                    value={option}
+                    checked={answers[question.id] === option}
+                    onChange={() => handleAnswerChange(question.id, option)}
+                    className='me-2'
+                  />
+                  {option}
+                </label>
+              ))}
             </div>
           </div>
-        ))}
-      </div>
-
-      <div className='quiz-footer d-flex'>
-        <button
-          onClick={handleSubmit}
-          className='btn btn-danger submit-quiz float-end'
-        >
-          Submit Quiz
-        </button>
+        </div>
+      ))}
+      <div className='d-flex justify-content-between mt-3'>
         <button
           onClick={handleEditQuiz}
-          className='edit-quiz btn btn-primary float-end'
+          className='btn btn-secondary rounded-pill'
         >
           Keep Editing This Quiz
+        </button>
+        <button onClick={handleSubmit} className='btn btn-primary rounded-pill'>
+          Submit Quiz
         </button>
       </div>
     </div>

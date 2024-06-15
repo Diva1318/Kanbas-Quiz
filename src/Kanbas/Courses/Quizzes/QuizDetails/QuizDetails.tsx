@@ -1,6 +1,6 @@
 import { MdOutlineModeEditOutline } from 'react-icons/md'
-import './style.css'
-export default function Quizzes () {
+import './index.css'
+export default function QuizDetails () {
   return (
     <div id='wd-quizzes'>
       <div
@@ -26,7 +26,7 @@ export default function Quizzes () {
       <div id='wd-quiz-details' className='text-nowrap'>
         <h1>Q1-HTML</h1>
         <div className='table-responsive custon-quiz-table'>
-          <table className='table table-borderless '>
+          <table className='table table-borderless'>
             <tbody>
               <tr>
                 <th>Quiz Type</th>
