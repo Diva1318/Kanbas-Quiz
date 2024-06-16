@@ -21,6 +21,7 @@ export default function Assignments () {
       (assignment: any) => assignment.course === cid
     )
   )
+  console.log(assignments)
   const dispatch = useDispatch()
 
   const fetchAssignments = async () => {

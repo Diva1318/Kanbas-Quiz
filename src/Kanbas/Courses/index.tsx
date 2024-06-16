@@ -13,7 +13,7 @@ import QuizQuestionEditor from './Quizzes/QuizEditor/QuestionsEditor'
 import QuizEditorTOC from './Quizzes/QuizEditorTOC'
 import QuizPreviewScreen from './Quizzes/QuizPreviewScreen'
 import QuizDetails from './Quizzes/QuizDetails/QuizDetails'
-import QuizList from './Quizzes'
+import Quiz from './Quizzes'
 
 export default function Courses ({ courses }: { courses: any[] }) {
   const { cid, qid } = useParams()
@@ -44,8 +44,13 @@ export default function Courses ({ courses }: { courses: any[] }) {
             <Route path='/Zoom' element={<h1>Zoom</h1>} />
             <Route path='/Assignments' element={<Assignments />} />
             <Route path='/Assignments/:aid' element={<AssignmentEditor />} />
-            <Route path='/Quizzes' element={<QuizList />} />
-            <Route path='/Quizzes/*' element={<QuizDetailsEditor />} />
+            <Route path='/Quizzes' element={<Quiz />} />
+            <Route path='/Quizzes/QuizDetails' element={<QuizDetails />} />
+            <Route
+              path='/Quizzes/QuizDetailsEditor'
+              element={<QuizEditorTOC />}
+            />
+
             <Route path='/Grades' element={<Grades />} />
           </Routes>
         </div>

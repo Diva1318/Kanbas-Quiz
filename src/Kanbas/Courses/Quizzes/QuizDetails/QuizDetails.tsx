@@ -1,6 +1,7 @@
 import { MdOutlineModeEditOutline } from 'react-icons/md'
+import { Link } from 'react-router-dom'
 import './index.css'
-export default function QuizDetails () {
+export default function () {
   return (
     <div id='wd-quizzes'>
       <div
@@ -13,13 +14,14 @@ export default function QuizDetails () {
         >
           Preview
         </button>
-        <button
+        <Link
           id='wd-quiz-edit-btn'
           className='btn btn-lg btn-secondary me-1 text-center'
+          to={`/Kanbas/Courses/Quizzes/QuizDetailsEditor`}
         >
           <MdOutlineModeEditOutline />
           Edit
-        </button>
+        </Link>
       </div>
       <br />
       <hr />

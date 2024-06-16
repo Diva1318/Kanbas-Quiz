@@ -1,5 +1,6 @@
 [
     {
+    "id": "q1",
     "title": "Quiz 1",
     "instructions": "Instruction",
     "quizType": "Practice Quiz",
@@ -21,6 +22,7 @@
     "showCorrectAnswers": "Immediately"
 },
 {
+    "id": "q2",
     "title": "Quiz 2",
     "instructions": "Instruction",
     "quizType": "Practice Quiz",
@@ -42,6 +44,7 @@
     "showCorrectAnswers": "Immediately"
 },
 {
+    "id": "q3",
     "title": "Quiz 3",
     "instructions": "Instruction",
     "quizType": "Practice Quiz",
@@ -63,6 +66,7 @@
     "showCorrectAnswers": "Immediately"
 },
 {
+    "id": "q4",
     "title": "Quiz 4",
     "instructions": "Instruction",
     "quizType": "Practice Quiz",
@@ -84,6 +88,7 @@
     "showCorrectAnswers": "Immediately"
 },
 {
+    "id": "q5",
     "title": "Quiz 5",
     "instructions": "Instruction",
     "quizType": "Practice Quiz",

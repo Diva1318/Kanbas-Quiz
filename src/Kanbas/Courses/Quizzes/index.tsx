@@ -3,13 +3,38 @@ import { FaCheckCircle, FaPlus, FaSearch, FaTrash } from 'react-icons/fa'
 import { IoIosRocket } from 'react-icons/io'
 import { IoEllipsisVertical } from 'react-icons/io5'
 import { VscNotebook } from 'react-icons/vsc'
-import { Link } from 'react-router-dom'
+import { useDispatch, useSelector } from 'react-redux'
+import { Link, useParams } from 'react-router-dom'
 import QuizDetailsEditor from './QuizEditor/QuizDetailsEditor'
 import './style.css'
+import { addQuizzes, deleteQuizzes, updateQuizzes, setQuizzes } from './reducer'
+import * as client from './client'
+import { useEffect } from 'react'
 
 const defaultDate = new Date().toISOString().split('T')[0]
 
-export default function QuizList () {
+export default function Quiz () {
+  const { cid, qi } = useParams()
+  const dispatch = useDispatch()
+  console.log(cid)
+  const quizzes = useSelector((state: any) =>
+    state.quizzesReducer.quizzes.filter((quiz: any) => quiz.course === cid)
+  )
+  console.log(quizzes)
+  const fetchQuizzes = async () => {
+    try {
+      const quizzes = await client.findQuizzesForCourse(cid as string)
+      dispatch(setQuizzes(quizzes))
+    } catch (error) {
+      console.error('Error fetching quizzes:', error)
+    }
+  }
+    // console.log
+
+  useEffect(() => {
+    fetchQuizzes()
+  }, [cid, dispatch])
+
   return (
     <div id='wd-quiz-list' className='container'>
       <div className='d-flex justify-content-between align-items-center mb-3'>
@@ -43,21 +68,65 @@ export default function QuizList () {
             </button>
           </div>
         </h3>
-        <ul id='wd-quiz-list' className='list-group rounded-0'>
-          <li className='wd-quiz-list-item list-group-item p-3 ps-1'>
+
+        <div id='wd-quiz-list' className='list-group rounded-0'>
+          {quizzes.map((quiz: any) => (
+            <li
+              key={quiz.id}
+              className='wd-quiz-list-item list-group-item p-3 ps-1'
+            >
+              <div className='d-flex align-items-center'>
+                <div className='icons-wrapper'>
+                  <BsGripVertical className='me-2 fs-3 icon-color' />
+                  <IoIosRocket className='me-2 fs-5 icon-color' />
+                </div>
+                <div className='flex-grow-1'>
+                  <Link
+                    className='wd-assignment-link text-green no-underline'
+                    to={`/Kanbas/Courses/${cid}/Quizzes/${quiz.id}`}
+                  >
+                    <strong>{quiz.title}</strong>
+                  </Link>
+                  <br />
+                  <span className='wd-quiz-details'>
+                    <strong> Available </strong>
+                    <span className='text-danger'>Multiple Dates</span> |
+                    <strong> Not available until </strong>{' '}
+                    {quiz.availableFrom || defaultDate} | |
+                    <br />
+                    <strong> Due</strong> {quiz.dueDate || defaultDate} |
+                    <strong> {quiz.points || 'No'}</strong> pts|
+                  </span>
+                </div>
+                <div className='d-flex'>
+                  <button className='btn btn-secondary btn-lg me-2'>
+                    <FaTrash />
+                  </button>
+                  <button className='btn btn-secondary btn-lg'>
+                    <IoEllipsisVertical className='fs-4' />
+                  </button>
+                </div>
+              </div>
+            </li>
+          ))}
+        </div>
+      </li>
+    </div>
+  )
+  {
+    /* <li className='wd-quiz-list-item list-group-item p-3 ps-1'>
             <div className='d-flex align-items-center'>
               <div className='icons-wrapper'>
                 <BsGripVertical className='me-2 fs-3 icon-color' />
                 <IoIosRocket className='me-2 fs-5 icon-color' />
               </div>
               <div className='flex-grow-1'>
-                {/* <Link
-                                        className='wd-assignment-link text-green no-underline'
-                                        to={`/Kanbas/Courses/${cid}/Assignments/${assignment._id}`}
-                                    >
-                                        <strong>{assignment.title}</strong>
-                                    </Link> */}
-                <strong>Q1-HTML</strong>
+                <Link
+                  className='wd-assignment-link text-green no-underline'
+                  to={`/Kanbas/Courses/${cid}/Quizzes/${qid}`}
+                >
+                  <strong>Q1</strong>
+                </Link>
                 <br />
                 <span className='wd-quiz-details'>
                   <strong> Available </strong>
@@ -76,7 +145,9 @@ export default function QuizList () {
             </div>
           </li>
         </ul>
-      </li>
-    </div>
-  )
+      </li> */
+  }
+}
+function dispatch (arg0: { payload: any; type: 'quizzes/setQuizzes' }) {
+  throw new Error('Function not implemented.')
 }
