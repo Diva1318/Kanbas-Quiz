@@ -11,6 +11,9 @@ import * as client from './client'
 import { useEffect, useState } from 'react'
 import QuizEditor from './QuizEditor'
 import QuestionsEditor from './QuizEditor/QuestionsEditor'
+import QuizPreview from './QuizPreviewScreen'
+import QuizDetailsEditor from './QuizEditor/QuizDetailsEditor'
+import QuizQuestionEditor from './QuizEditor/QuestionsEditor'
 
 const defaultDate = new Date().toISOString().split('T')[0]
 
@@ -98,7 +101,7 @@ export default function Quiz () {
           <div id='wd-quiz-list' className='list-group rounded-0'>
             {quizzes.map((quiz: any) => (
               <li
-                key={quiz.id}
+                key={quiz._id}
                 className='wd-quiz-list-item list-group-item p-3 ps-1'
               >
                 <div className='d-flex align-items-center'>
@@ -109,7 +112,7 @@ export default function Quiz () {
                   <div className='flex-grow-1'>
                     <Link
                       className='wd-assignment-link text-green no-underline'
-                      to={`/Kanbas/Courses/${cid}/Quizzes/${quiz.id}`}
+                      to={`/Kanbas/Courses/${cid}/quizzes/${quiz._id}`}
                     >
                       <strong>{quiz.title}</strong>
                     </Link>
@@ -138,6 +141,11 @@ export default function Quiz () {
           </div>
         </li>
       </ul>
+
+      <QuizPreview />
+      <br />
+      <QuizEditor />
+      {/* <QuizDetailsEditor /> */}
       <QuestionsEditor />
 
       {/* Delete Confirmation Modal */}

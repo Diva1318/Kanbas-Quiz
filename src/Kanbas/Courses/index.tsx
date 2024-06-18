@@ -19,14 +19,14 @@ import PeopleTable from './People/Table'
 export default function Courses ({ courses }: { courses: any[] }) {
   const { cid, qid } = useParams()
   const course = courses.find(course => course._id === cid)
-  // const quiz = course?.quizzes.find((quiz: any) => quiz._id === qid)
+  // const quiz = course.quizzes.find((quiz: any) => quiz.id === qid)
   const { pathname } = useLocation()
   return (
     <div id='wd-courses'>
       <h2 className='text-danger'>
         <FaAlignJustify className='me-4 fs-4 mb-1' />
         {course && course.name} &gt; {pathname.split('/')[4]}
-        {/*  &gt;{' '}
+        {/* &gt;{' '}
         {quiz && quiz.name}{' '} */}
       </h2>
 
@@ -48,8 +48,8 @@ export default function Courses ({ courses }: { courses: any[] }) {
             <Route path='/Quizzes' element={<Quiz />} />
             <Route path='/Quizzes/:qid' element={<QuizDetails />} />
             <Route
-              path='/Quizzes/QuizDetailsEditor'
-              element={<QuizEditorTOC />}
+              path='/Quizzes/editor'
+              element={<QuizEditor />}
             />
             <Route path='People' element={<PeopleTable />} />
             <Route path='People/:uid' element={<PeopleTable />} />

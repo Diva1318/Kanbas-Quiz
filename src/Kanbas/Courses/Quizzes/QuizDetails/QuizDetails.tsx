@@ -1,8 +1,41 @@
 import { MdOutlineModeEditOutline } from 'react-icons/md'
 import { Link, useParams } from 'react-router-dom'
 import './index.css'
-export default function () {
+import * as client from '../client'
+import { setQuizzes } from '../reducer'
+import { useDispatch, useSelector } from 'react-redux'
+import { useEffect, useState } from 'react'
+
+export default function QuizDetails () {
   const { cid, qid } = useParams()
+  const dispatch = useDispatch()
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  const fetchQuiz = async () => {
+    try {
+      if (qid !== 'New') {
+        const quiz = await client.findQuiz(cid as string, qid as string)
+        dispatch(setQuizzes([quiz]))
+      }
+    } catch (err: any) {
+      setError(err.message)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    fetchQuiz()
+ 
+  }, [cid, qid])
+
+  const quiz = useSelector((state: any) =>
+    state.quizzesReducer.quizzes.find((q: any) => q._id === qid)
+  )
+
+
+
   return (
     <div id='wd-quizzes'>
       <div
@@ -11,14 +44,14 @@ export default function () {
       >
         <button
           id='wd-preview-btn'
-          className='btn btn-lg btn-secondary me-1  text-center'
+          className='btn btn-lg btn-secondary me-1 text-center'
         >
           Preview
         </button>
         <Link
           id='wd-quiz-edit-btn'
           className='btn btn-lg btn-secondary me-1 text-center'
-          to={`/Kanbas/Courses/Quizzes/QuizDetailsEditor`}
+          to={`/Kanbas/Courses/${cid}/Quizzes/${qid}/editor`}
         >
           <MdOutlineModeEditOutline />
           Edit
@@ -27,33 +60,33 @@ export default function () {
       <br />
       <hr />
       <div id='wd-quiz-details' className='text-nowrap'>
-        <h1>Q1-HTML</h1>
+        <h1>{quiz.title}</h1>
         <div className='table-responsive custon-quiz-table'>
           <table className='table table-borderless'>
             <tbody>
               <tr>
                 <th>Quiz Type</th>
-                <td>Graded Quiz</td>
+                <td>{quiz.quizType}</td>
               </tr>
               <tr>
                 <th>Points</th>
-                <td>29</td>
+                <td>{quiz.points}</td>
               </tr>
               <tr>
                 <th>Assignment Group</th>
-                <td>Quizzes</td>
+                <td>{quiz.assignmentGroup}</td>
               </tr>
               <tr>
                 <th>Shuffle Answers</th>
-                <td>No</td>
+                <td>{quiz.shuffleAnswers ? 'Yes' : 'No'}</td>
               </tr>
               <tr>
                 <th>Time Limit</th>
-                <td>30 Minutes</td>
+                <td>{quiz.timeLimit}</td>
               </tr>
               <tr>
                 <th>Multiple Attempts</th>
-                <td>No</td>
+                <td>{quiz.multipleAttempts ? 'Yes' : 'No'}</td>
               </tr>
               <tr>
                 <th>View Responses</th>
@@ -61,11 +94,11 @@ export default function () {
               </tr>
               <tr>
                 <th>Show Correct Answers</th>
-                <td>Immediately</td>
+                <td>{quiz.showCorrectAnswers}</td>
               </tr>
               <tr>
                 <th>One Question at a Time</th>
-                <td>Yes</td>
+                <td>{quiz.oneQuestionAtATime ? 'Yes' : 'No'}</td>
               </tr>
               <tr>
                 <th>Require Respondus Lockdown Browser</th>
@@ -77,11 +110,11 @@ export default function () {
               </tr>
               <tr>
                 <th>Webcam Required</th>
-                <td>No</td>
+                <td>{quiz.webcamRequired ? 'Yes' : 'No'}</td>
               </tr>
               <tr>
                 <th>Lock Questions After Answering</th>
-                <td>No</td>
+                <td>{quiz.lockQuestionsAfterAnswering ? 'Yes' : 'No'}</td>
               </tr>
             </tbody>
           </table>
@@ -98,10 +131,10 @@ export default function () {
             </thead>
             <tbody>
               <tr>
-                <td>Sep 21 at 1 pm</td>
+                <td>{quiz.dueDate}</td>
                 <td>Everyone</td>
-                <td>Sep 21 at 11:40 am</td>
-                <td>Sep 21 at 1 pm</td>
+                <td>{quiz.availableDate}</td>
+                <td>{quiz.untilDate}</td>
               </tr>
             </tbody>
           </table>

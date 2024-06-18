@@ -66,9 +66,7 @@ export default function QuizQuestionEditor () {
               />
             </div>
           </div>
-          <div className='card-body'>
-            {renderEditor()}
-          </div>
+          <div className='card-body'>{renderEditor()}</div>
           <div className='d-flex justify-content-end m-3'>
             <button type='button' className='btn btn-secondary me-2'>
               Cancel

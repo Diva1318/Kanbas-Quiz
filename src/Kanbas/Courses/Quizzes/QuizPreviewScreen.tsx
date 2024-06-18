@@ -1,34 +1,44 @@
 import React, { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import 'bootstrap/dist/css/bootstrap.min.css' // Ensure Bootstrap is imported
 
-// Define types for question and answers
 interface Question {
   id: number
   text: string
-  options: string[]
+  type: 'multiple-choice' | 'fill-in-the-blank' | 'true-false'
+  options?: string[]
 }
 
 interface Answers {
   [key: number]: string
 }
 
-// Mock data to simulate server responses
 const mockQuestions: Question[] = [
   {
     id: 1,
     text: 'An HTML label element can be associated with an HTML input element by setting their id attributes to the same value. The resulting effect is that when you click on the label text, the input element receives focus as if you had clicked on the input element itself.',
+    type: 'true-false',
     options: ['True', 'False']
+  },
+  {
+    id: 2,
+    text: 'What is the capital of France?',
+    type: 'multiple-choice',
+    options: ['Berlin', 'Madrid', 'Paris', 'Rome']
+  },
+  {
+    id: 3,
+    text: 'Fill in the blank: The chemical formula for water is _____.',
+    type: 'fill-in-the-blank'
   }
-  // Add more questions as needed
 ]
 
 const mockPreviousAnswers: Answers = {
-  1: 'True'
-  // Add previous answers for other questions if needed
+  1: 'True',
+  2: 'Paris',
+  3: 'H2O'
 }
 
-const QuizPreview: React.FC = () => {
+export default function QuizPreview () {
   const { quizId } = useParams<{ quizId: string }>()
   const navigate = useNavigate()
   const [questions, setQuestions] = useState<Question[]>([])
@@ -75,40 +85,69 @@ const QuizPreview: React.FC = () => {
           </div>
           <div className='card-body'>
             <p>{question.text}</p>
-            <div className='list-group'>
-              {question.options.map(option => (
-                <label
-                  key={option}
-                  className='list-group-item d-flex align-items-center'
-                >
-                  <input
-                    type='radio'
-                    name={`question-${question.id}`}
-                    value={option}
-                    checked={answers[question.id] === option}
-                    onChange={() => handleAnswerChange(question.id, option)}
-                    className='me-2'
-                  />
-                  {option}
-                </label>
-              ))}
-            </div>
+            {question.type === 'multiple-choice' && (
+              <div className='list-group'>
+                {question.options?.map(option => (
+                  <label
+                    key={option}
+                    className='list-group-item d-flex align-items-center'
+                  >
+                    <input
+                      type='radio'
+                      name={`question-${question.id}`}
+                      value={option}
+                      checked={answers[question.id] === option}
+                      onChange={() => handleAnswerChange(question.id, option)}
+                      className='me-2'
+                    />
+                    {option}
+                  </label>
+                ))}
+              </div>
+            )}
+            {question.type === 'true-false' && (
+              <div className='list-group'>
+                {question.options?.map(option => (
+                  <label
+                    key={option}
+                    className='list-group-item d-flex align-items-center'
+                  >
+                    <input
+                      type='radio'
+                      name={`question-${question.id}`}
+                      value={option}
+                      checked={answers[question.id] === option}
+                      onChange={() => handleAnswerChange(question.id, option)}
+                      className='me-2'
+                    />
+                    {option}
+                  </label>
+                ))}
+              </div>
+            )}
+            {question.type === 'fill-in-the-blank' && (
+              <div className='mb-3'>
+                <input
+                  type='text'
+                  className='form-control'
+                  value={answers[question.id] || ''}
+                  onChange={e =>
+                    handleAnswerChange(question.id, e.target.value)
+                  }
+                />
+              </div>
+            )}
           </div>
         </div>
       ))}
       <div className='d-flex justify-content-between mt-3'>
-        <button
-          onClick={handleEditQuiz}
-          className='btn btn-secondary rounded-pill'
-        >
+        <button onClick={handleEditQuiz} className='btn btn-secondary'>
           Keep Editing This Quiz
         </button>
-        <button onClick={handleSubmit} className='btn btn-primary rounded-pill'>
+        <button onClick={handleSubmit} className='btn btn-danger'>
           Submit Quiz
         </button>
       </div>
     </div>
   )
 }
-
-export default QuizPreview
