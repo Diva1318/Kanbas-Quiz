@@ -14,6 +14,7 @@ import QuizEditorTOC from './Quizzes/QuizEditorTOC'
 import QuizPreviewScreen from './Quizzes/QuizPreviewScreen'
 import QuizDetails from './Quizzes/QuizDetails/QuizDetails'
 import Quiz from './Quizzes'
+import PeopleTable from './People/Table'
 
 export default function Courses ({ courses }: { courses: any[] }) {
   const { cid, qid } = useParams()
@@ -45,11 +46,13 @@ export default function Courses ({ courses }: { courses: any[] }) {
             <Route path='/Assignments' element={<Assignments />} />
             <Route path='/Assignments/:aid' element={<AssignmentEditor />} />
             <Route path='/Quizzes' element={<Quiz />} />
-            <Route path='/Quizzes/QuizDetails' element={<QuizDetails />} />
+            <Route path='/Quizzes/:qid' element={<QuizDetails />} />
             <Route
               path='/Quizzes/QuizDetailsEditor'
               element={<QuizEditorTOC />}
             />
+            <Route path='People' element={<PeopleTable />} />
+            <Route path='People/:uid' element={<PeopleTable />} />
 
             <Route path='/Grades' element={<Grades />} />
           </Routes>

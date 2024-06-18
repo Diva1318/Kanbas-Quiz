@@ -1,7 +1,8 @@
 import { MdOutlineModeEditOutline } from 'react-icons/md'
-import { Link } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
 import './index.css'
 export default function () {
+  const { cid, qid } = useParams()
   return (
     <div id='wd-quizzes'>
       <div

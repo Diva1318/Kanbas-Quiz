@@ -5,22 +5,23 @@ import { IoEllipsisVertical } from 'react-icons/io5'
 import { VscNotebook } from 'react-icons/vsc'
 import { useDispatch, useSelector } from 'react-redux'
 import { Link, useParams } from 'react-router-dom'
-import QuizDetailsEditor from './QuizEditor/QuizDetailsEditor'
 import './style.css'
 import { addQuizzes, deleteQuizzes, updateQuizzes, setQuizzes } from './reducer'
 import * as client from './client'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
+import QuizEditor from './QuizEditor'
+import QuestionsEditor from './QuizEditor/QuestionsEditor'
 
 const defaultDate = new Date().toISOString().split('T')[0]
 
 export default function Quiz () {
-  const { cid, qi } = useParams()
+  const { cid } = useParams()
   const dispatch = useDispatch()
-  console.log(cid)
+
   const quizzes = useSelector((state: any) =>
     state.quizzesReducer.quizzes.filter((quiz: any) => quiz.course === cid)
   )
-  console.log(quizzes)
+
   const fetchQuizzes = async () => {
     try {
       const quizzes = await client.findQuizzesForCourse(cid as string)
@@ -29,11 +30,32 @@ export default function Quiz () {
       console.error('Error fetching quizzes:', error)
     }
   }
-    // console.log
 
   useEffect(() => {
     fetchQuizzes()
   }, [cid, dispatch])
+
+  const [showModal, setShowModal] = useState(false)
+  const [selectedQuizId, setSelectedQuizId] = useState<string | null>(null)
+
+  const handleDeleteClick = (quizId: string) => {
+    setSelectedQuizId(quizId)
+    setShowModal(true)
+  }
+
+  const handleDeleteConfirm = async () => {
+    if (selectedQuizId) {
+      await client.deleteQuiz(selectedQuizId)
+      dispatch(deleteQuizzes(selectedQuizId))
+      setShowModal(false)
+      setSelectedQuizId(null)
+    }
+  }
+
+  const handleDeleteCancel = () => {
+    setShowModal(false)
+    setSelectedQuizId(null)
+  }
 
   return (
     <div id='wd-quiz-list' className='container'>
@@ -49,105 +71,117 @@ export default function Quiz () {
           />
         </div>
         <div className='d-flex'>
-          <button id='wd-add-assignment-group' className='btn btn-danger'>
+          <Link
+            to={`/Kanbas/Courses/${cid}/Quizzes/New`}
+            className='btn btn-danger'
+          >
             <FaPlus className='me-1' />
             Quiz
-          </button>
-          <button className='btn  btn-secondary btn-lg me-2'>
+          </Link>
+          <button className='btn btn-secondary btn-lg me-2'>
             <IoEllipsisVertical className='fs-4' />
           </button>
         </div>
       </div>
-      <li className='list-group-item p-0 mb-5 fs-5 border-gray'>
-        <h3 id='wd-quizzes-title' className='bg-light p-3 ps-2'>
-          <BsGripVertical className='me-2 fs-3' />
-          Quizzes
-          <div className='d-flex float-end'>
-            <button className='percentage-badge border-gray float-end'>
-              20% of Total
-            </button>
-          </div>
-        </h3>
+      <ul className='list-group p-0 mb-5 fs-5 border-gray'>
+        <li className='list-group-item'>
+          <h3 id='wd-quizzes-title' className='bg-light p-3 ps-2'>
+            <BsGripVertical className='me-2 fs-3' />
+            Quizzes
+            <div className='d-flex float-end'>
+              <button className='percentage-badge border-gray float-end'>
+                20% of Total
+              </button>
+            </div>
+          </h3>
 
-        <div id='wd-quiz-list' className='list-group rounded-0'>
-          {quizzes.map((quiz: any) => (
-            <li
-              key={quiz.id}
-              className='wd-quiz-list-item list-group-item p-3 ps-1'
-            >
-              <div className='d-flex align-items-center'>
-                <div className='icons-wrapper'>
-                  <BsGripVertical className='me-2 fs-3 icon-color' />
-                  <IoIosRocket className='me-2 fs-5 icon-color' />
-                </div>
-                <div className='flex-grow-1'>
-                  <Link
-                    className='wd-assignment-link text-green no-underline'
-                    to={`/Kanbas/Courses/${cid}/Quizzes/${quiz.id}`}
-                  >
-                    <strong>{quiz.title}</strong>
-                  </Link>
-                  <br />
-                  <span className='wd-quiz-details'>
-                    <strong> Available </strong>
-                    <span className='text-danger'>Multiple Dates</span> |
-                    <strong> Not available until </strong>{' '}
-                    {quiz.availableFrom || defaultDate} | |
+          <div id='wd-quiz-list' className='list-group rounded-0'>
+            {quizzes.map((quiz: any) => (
+              <li
+                key={quiz.id}
+                className='wd-quiz-list-item list-group-item p-3 ps-1'
+              >
+                <div className='d-flex align-items-center'>
+                  <div className='icons-wrapper'>
+                    <BsGripVertical className='me-2 fs-3 icon-color' />
+                    <IoIosRocket className='me-2 fs-5 icon-color' />
+                  </div>
+                  <div className='flex-grow-1'>
+                    <Link
+                      className='wd-assignment-link text-green no-underline'
+                      to={`/Kanbas/Courses/${cid}/Quizzes/${quiz.id}`}
+                    >
+                      <strong>{quiz.title}</strong>
+                    </Link>
                     <br />
-                    <strong> Due</strong> {quiz.dueDate || defaultDate} |
-                    <strong> {quiz.points || 'No'}</strong> pts|
-                  </span>
+                    <span className='wd-quiz-details'>
+                      <strong> Available </strong>
+                      <span className='text-danger'>Multiple Dates</span> |
+                      <strong> Not available until </strong>{' '}
+                      {quiz.availableFrom || defaultDate} |
+                      <br />
+                      <strong> Due</strong> {quiz.dueDate || defaultDate} |
+                      <strong> {quiz.points || 'No'}</strong> pts
+                    </span>
+                  </div>
+                  <div className='d-flex'>
+                    <FaCheckCircle className='text-success me-2' />
+                    <FaTrash
+                      className='text-danger me-2'
+                      onClick={() => handleDeleteClick(quiz.id)}
+                    />
+                    <IoEllipsisVertical className='fs-5' />
+                  </div>
                 </div>
-                <div className='d-flex'>
-                  <button className='btn btn-secondary btn-lg me-2'>
-                    <FaTrash />
-                  </button>
-                  <button className='btn btn-secondary btn-lg'>
-                    <IoEllipsisVertical className='fs-4' />
-                  </button>
-                </div>
-              </div>
-            </li>
-          ))}
+              </li>
+            ))}
+          </div>
+        </li>
+      </ul>
+      <QuestionsEditor />
+
+      {/* Delete Confirmation Modal */}
+      {showModal && <div className='modal-backdrop fade show'></div>}
+      <div
+        id='wd-delete-quiz-modal'
+        className={`modal fade ${showModal ? 'show d-block' : ''}`}
+        role='dialog'
+        style={{ display: showModal ? 'block' : 'none' }}
+      >
+        <div className='modal-dialog'>
+          <div className='modal-content'>
+            <div className='modal-header'>
+              <h5 className='modal-title fs-5' id='staticBackdropLabel'>
+                Delete Quiz
+              </h5>
+              <button
+                type='button'
+                className='btn-close'
+                onClick={handleDeleteCancel}
+              ></button>
+            </div>
+            <div className='modal-body'>
+              <p>Are you sure you want to delete this quiz?</p>
+            </div>
+            <div className='modal-footer'>
+              <button
+                type='button'
+                className='btn btn-secondary'
+                onClick={handleDeleteCancel}
+              >
+                Cancel
+              </button>
+              <button
+                type='button'
+                className='btn btn-danger'
+                onClick={handleDeleteConfirm}
+              >
+                Delete
+              </button>
+            </div>
+          </div>
         </div>
-      </li>
+      </div>
     </div>
   )
-  {
-    /* <li className='wd-quiz-list-item list-group-item p-3 ps-1'>
-            <div className='d-flex align-items-center'>
-              <div className='icons-wrapper'>
-                <BsGripVertical className='me-2 fs-3 icon-color' />
-                <IoIosRocket className='me-2 fs-5 icon-color' />
-              </div>
-              <div className='flex-grow-1'>
-                <Link
-                  className='wd-assignment-link text-green no-underline'
-                  to={`/Kanbas/Courses/${cid}/Quizzes/${qid}`}
-                >
-                  <strong>Q1</strong>
-                </Link>
-                <br />
-                <span className='wd-quiz-details'>
-                  <strong> Available </strong>
-                  <span className='text-danger'>Multiple Dates</span> |
-                  <strong> Not available until </strong> {defaultDate}|
-                  <br />
-                  <strong> Due</strong> {defaultDate} | 20 pts|3 questions
-                </span>
-              </div>
-              <FaCheckCircle className='text-success me-2' />
-              <FaTrash
-                className='text-danger me-2'
-                // onClick={() => handleDeleteClick(assignment._id)}
-              />
-              <IoEllipsisVertical className='fs-5' />
-            </div>
-          </li>
-        </ul>
-      </li> */
-  }
-}
-function dispatch (arg0: { payload: any; type: 'quizzes/setQuizzes' }) {
-  throw new Error('Function not implemented.')
 }

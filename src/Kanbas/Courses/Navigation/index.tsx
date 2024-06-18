@@ -12,7 +12,8 @@ export default function CoursesNavigation () {
     'Zoom',
     'Assignments',
     'Quizzes',
-    'Grades'
+    'Grades',
+    'People',
   ]
 
   return (
