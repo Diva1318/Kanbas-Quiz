@@ -142,12 +142,6 @@ export default function Quiz () {
         </li>
       </ul>
 
-      <QuizPreview />
-      <br />
-      <QuizEditor />
-      {/* <QuizDetailsEditor /> */}
-      <QuestionsEditor />
-
       {/* Delete Confirmation Modal */}
       {showModal && <div className='modal-backdrop fade show'></div>}
       <div

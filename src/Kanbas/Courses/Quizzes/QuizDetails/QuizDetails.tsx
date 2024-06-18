@@ -42,12 +42,13 @@ export default function QuizDetails () {
         id='wd-quiz-control-buttons'
         className='text-nowrap align-self-center'
       >
-        <button
+        <Link
           id='wd-preview-btn'
           className='btn btn-lg btn-secondary me-1 text-center'
+          to={`/Kanbas/Courses/${cid}/Quizzes/${qid}/preview`}
         >
           Preview
-        </button>
+        </Link>
         <Link
           id='wd-quiz-edit-btn'
           className='btn btn-lg btn-secondary me-1 text-center'

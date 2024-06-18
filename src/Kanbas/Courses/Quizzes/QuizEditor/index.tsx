@@ -1,39 +1,43 @@
-import { Link, useLocation, Routes, Route } from 'react-router-dom'
+import React, { useState } from 'react'
 import QuizDetailsEditor from './QuizDetailsEditor'
 import QuizQuestionEditor from './QuestionsEditor'
 
 export default function QuizEditor () {
-  const location = useLocation()
+  const [activeTab, setActiveTab] = useState('details')
 
   return (
     <div>
-      <ul className='nav nav-pills'>
+      <ul className='nav nav-tabs'>
         <li className='nav-item'>
-          <Link
-            to='details'
-            className={`nav-link ${
-              location.pathname.includes('details') ? 'active' : ''
-            }`}
+          <button
+            className={`nav-link ${activeTab === 'details' ? 'active' : ''}`}
+            onClick={() => setActiveTab('details')}
           >
             Details
-          </Link>
+          </button>
         </li>
         <li className='nav-item'>
-          <Link
-            to='questions'
-            className={`nav-link ${
-              location.pathname.includes('questions') ? 'active' : ''
-            }`}
+          <button
+            className={`nav-link ${activeTab === 'questions' ? 'active' : ''}`}
+            onClick={() => setActiveTab('questions')}
           >
             Questions
-          </Link>
+          </button>
         </li>
       </ul>
 
-      <Routes>
-        <Route path='details' element={<QuizDetailsEditor />} />
-        <Route path='questions' element={<QuizQuestionEditor />} />
-      </Routes>
+      <div className='tab-content'>
+        {activeTab === 'details' && (
+          <div className='tab-pane active'>
+            <QuizDetailsEditor />
+          </div>
+        )}
+        {activeTab === 'questions' && (
+          <div className='tab-pane active'>
+            <QuizQuestionEditor />
+          </div>
+        )}
+      </div>
     </div>
   )
 }

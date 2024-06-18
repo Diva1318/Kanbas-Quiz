@@ -23,11 +23,14 @@ export default function QuizQuestionEditor () {
   return (
     <div>
       <h1>Quiz Question Editor</h1>
+      <hr />
       <div>
-        <button type='button' className='btn btn-primary mb-2'>
-          + Add Question
-        </button>
-        <br />
+        <div className='d-flex justify-content-center'>
+          <button type='button' className='btn btn-danger mb-2'>
+            + Add Question
+          </button>
+        </div>
+        <hr />
         <div className='card'>
           <div className='card-header d-flex align-items-center justify-content-between'>
             <div className='me-2 flex-grow-1'>
