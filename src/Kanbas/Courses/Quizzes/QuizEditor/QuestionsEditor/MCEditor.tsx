@@ -50,7 +50,7 @@ export default function MCEditor () {
       </div>
       <div className=''>
         <label htmlFor='question' className='form-label'>
-          <strong>Question:</strong>
+          <strong>Description:</strong>
         </label>
         {/* <textarea
           id='question'
@@ -58,7 +58,12 @@ export default function MCEditor () {
           value={question}
           onChange={handleQuestionChange}
         /> */}
-        <RichTextEditor />
+        <RichTextEditor
+          value={''}
+          onChange={function (value: string): void {
+            throw new Error('Function not implemented.')
+          }}
+        />
       </div>
       <div className='mb-3'>
         <label className='form-label'>Answers:</label>

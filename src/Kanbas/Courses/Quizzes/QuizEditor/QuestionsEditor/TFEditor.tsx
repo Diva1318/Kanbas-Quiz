@@ -12,7 +12,9 @@ export default function QuizEditorTOC () {
           <strong>Question:</strong>
         </label>
         {/* <textarea id='question' className='form-control' /> */}
-        <RichTextEditor />
+        <RichTextEditor value={''} onChange={function (value: string): void {
+          throw new Error('Function not implemented.')
+        } } />
       </div>
       <div className='mb-3'>
         <label className='form-label'>Answers:</label>

@@ -20,22 +20,51 @@ export const findQuizzesForCourse = async (courseId : string) => {
   return response.data;
 };
 
+
+
 // export const findQuizzes = async (courseId : string, qid : string) => {
 //   const response = await axios.get(`${COURSES_API}/${courseId}/quizzes/${qid}`);
 //   return response.data;
 // };
 
-export const findQuiz = async (courseId : string, qid: string) => { // Changed from findQuizzes to findQuiz
-  const response = await axios.get(`${COURSES_API}/${courseId}/Quizzes/${qid}`);
-  return response.data;
+export const findQuiz = async (courseId: string, qid: string) => { // Changed from findQuizzes to findQuiz
+  try{  const response = await axios.get(`${COURSES_API}/${courseId}/Quizzes/${qid}`);
+    return response.data;
+  } catch (error : any) {
+        throw new Error('Error fetching quiz details: ' + error.message);
+
+  }
+ 
 };
 export const updateQuiz = async (quiz : any) => {
   const response = await axios.put(`${QUIZZES_API}/${quiz._id}`, quiz);
   return response.data;
 };
 
-export const findQuizQuestions = async (quizId : any) => {
-  const response = await axios.get(`${QUIZZES_API}/${quizId}/questions`);
-  return response.data;
-};
+// export const findQuizQuestions = async (quizId : any) => {
+//   const response = await axios.get(`${QUIZZES_API}/${quizId}/questions`);
+//   return response.data;
+// };
+
+// ///QUESTIONS
+// export const findAllQuestionsByQuizId= async (quizId : string) => {
+//   const response = await axios.get(`${QUIZZES_API}/${quizId}/questions`);
+//   return response.data;
+// };
+
+// export const deleteQuestion = async (questionId : string) => {
+//   const response = await axios.delete(`${QUESTIONS_API}/${questionId}`);
+//   return response.data;
+// };
+
+// export const createQuestion = async (quizId : string, question : any) => {
+//   const response = await axios.post(`${QUIZZES_API}/${quizId}/questions`, question);
+//   return response.data;
+// };
+
+// export const updateQuestion = async (question : any) => {
+//   const response = await axios.put(`${QUESTIONS_API}/${question._id}`, question);
+//   return response.data;
+// };
+
 

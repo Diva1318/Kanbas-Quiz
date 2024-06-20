@@ -1,59 +1,92 @@
-import React, { useState, useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate, useParams } from 'react-router-dom'
+import * as questionClient from './QuestionClient'
+import * as quizClient from './client'
+import { setQuestions as setQuestionsAction } from './QuestionsReducer'
+import './style.css'
 
 interface Question {
-  id: number
+  title: string
+  _id: string
   text: string
+  points: number
   type: 'multiple-choice' | 'fill-in-the-blank' | 'true-false'
   options?: string[]
+  answers: string[]
 }
 
 interface Answers {
-  [key: number]: string
+  [key: string]: string
 }
 
-const mockQuestions: Question[] = [
-  {
-    id: 1,
-    text: 'An HTML label element can be associated with an HTML input element by setting their id attributes to the same value. The resulting effect is that when you click on the label text, the input element receives focus as if you had clicked on the input element itself.',
-    type: 'true-false',
-    options: ['True', 'False']
-  },
-  {
-    id: 2,
-    text: 'What is the capital of France?',
-    type: 'multiple-choice',
-    options: ['Berlin', 'Madrid', 'Paris', 'Rome']
-  },
-  {
-    id: 3,
-    text: 'Fill in the blank: The chemical formula for water is _____.',
-    type: 'fill-in-the-blank'
-  }
-]
-
-const mockPreviousAnswers: Answers = {
-  1: 'True',
-  2: 'Paris',
-  3: 'H2O'
+interface Quiz {
+  title: string
+  multipleAttempts: boolean
 }
 
 export default function QuizPreview () {
-  const { quizId } = useParams<{ quizId: string }>()
+  const { cid, quizId } = useParams()
   const navigate = useNavigate()
-  const [questions, setQuestions] = useState<Question[]>([])
+  const dispatch = useDispatch()
   const [answers, setAnswers] = useState<Answers>({})
-  const [previousAnswers, setPreviousAnswers] = useState<Answers>({})
+  const [score, setScore] = useState<number | null>(null)
+  const [incorrectQuestions, setIncorrectQuestions] = useState<string[]>([])
+  const [attemptsLeft, setAttemptsLeft] = useState<number | null>(null)
+  const [quizDetails, setQuizDetails] = useState<Quiz | null>(null)
+
+  const questions = useSelector((state: any) =>
+    state.questionsReducer.questions.filter(
+      (question: any) => question.quiz === quizId
+    )
+  )
+
+  const fetchQuestions = async () => {
+    try {
+      const fetchedQuestions = await questionClient.findAllQuestionsByQuizId(
+        quizId as string
+      )
+      const questionsWithOptions = fetchedQuestions.map(
+        (question: Question) => {
+          if (
+            question.type === 'true-false' &&
+            (!question.options || question.options.length === 0)
+          ) {
+            return { ...question, options: ['True', 'False'] }
+          }
+          return question
+        }
+      )
+      dispatch(setQuestionsAction(questionsWithOptions))
+    } catch (error) {
+      console.error('Error fetching questions:', error)
+    }
+  }
+
+  const fetchQuizDetails = async () => {
+    try {
+      const fetchedQuizDetails = await quizClient.findQuiz(
+        cid as string,
+        quizId as string
+      )
+      setQuizDetails(fetchedQuizDetails)
+      if (fetchedQuizDetails.multipleAttempts) {
+        const savedAttemptsLeft = localStorage.getItem(
+          `quiz-${quizId}-attemptsLeft`
+        )
+        setAttemptsLeft(savedAttemptsLeft ? parseInt(savedAttemptsLeft) : 3)
+      }
+    } catch (error) {
+      console.error('Error fetching quiz details:', error)
+    }
+  }
 
   useEffect(() => {
-    // Simulate fetching quiz questions
-    setQuestions(mockQuestions)
-
-    // Simulate fetching previous answers
-    setPreviousAnswers(mockPreviousAnswers)
+    fetchQuestions()
+    fetchQuizDetails()
   }, [quizId])
 
-  const handleAnswerChange = (questionId: number, answer: string) => {
+  const handleAnswerChange = (questionId: string, answer: string) => {
     setAnswers({
       ...answers,
       [questionId]: answer
@@ -61,29 +94,105 @@ export default function QuizPreview () {
   }
 
   const handleSubmit = () => {
-    console.log('Quiz submitted successfully:', answers)
-    // Handle successful submission, e.g., display score or save to local storage
-    localStorage.setItem(`quiz-${quizId}-answers`, JSON.stringify(answers))
+    let newScore = 0
+    const incorrect = [] as any
+    questions.forEach((question: Question) => {
+      if (answers[question._id] === question.answers[0]) {
+        newScore += question.points
+      } else {
+        incorrect.push(question._id)
+      }
+    })
+    setScore(newScore)
+    setIncorrectQuestions(incorrect)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+    if (quizDetails?.multipleAttempts) {
+      setAttemptsLeft(prev => {
+        const newAttemptsLeft = prev !== null ? prev - 1 : null
+        localStorage.setItem(
+          `quiz-${quizId}-attemptsLeft`,
+          newAttemptsLeft?.toString() || '0'
+        )
+        return newAttemptsLeft
+      })
+    }
+    console.log('Quiz submitted successfully:', answers, 'Score:', newScore)
+  }
+
+  const handleRetakeQuiz = () => {
+    setAnswers({})
+    setScore(null)
+    setIncorrectQuestions([])
+  }
+
+  const getScoreComment = (percentage: number) => {
+    if (percentage === 100) {
+      return "Perfect score! You're a genius!"
+    } else if (percentage >= 75) {
+      return 'Great job! Almost perfect!'
+    } else if (percentage >= 50) {
+      return "Not bad! You're getting there!"
+    } else if (percentage >= 25) {
+      return 'You can do better! Keep trying!'
+    } else {
+      return 'Well, at least you tried. Better luck next time!'
+    }
   }
 
   const handleEditQuiz = () => {
-    navigate(`/quizzes/${quizId}/edit`)
+    navigate(`/Kanbas/Courses/${quizId}/QuizDetailsEditor`)
   }
+
+  const totalPoints = questions.reduce(
+    (acc: number, q: Question) => acc + q.points,
+    0
+  )
+  const percentageScore = score !== null ? (score / totalPoints) * 100 : 0
+  const scoreComment = getScoreComment(percentageScore)
 
   return (
     <div className='container mt-5'>
-      <h1>Q1 - HTML</h1>
+      {score !== null && (
+        <div className='mt-4'>
+          <div className='card text-center'>
+            <div className='card-header'>
+              <h3 className='card-title'>Total Score</h3>
+            </div>
+            <div className='card-body'>
+              <h1 className='display-4'>{score}</h1>
+              <p className='card-text'>
+                You scored {score} points out of a possible {totalPoints}.<br />
+              </p>
+            </div>
+            <div className='card-footer text-muted'>{scoreComment}</div>
+          </div>
+        </div>
+      )}
+      <h1>Quiz Preview</h1>
       <div className='alert alert-info' role='alert'>
         This is a preview of the published version of the quiz
+      {quizDetails?.multipleAttempts}
+        {attemptsLeft}
       </div>
+      {quizDetails?.multipleAttempts && attemptsLeft !== null && (
+        <div className='alert alert-warning' role='alert'>
+          This quiz allows multiple attempts. Attempts left: {attemptsLeft}
+        </div>
+      )}
       <h2>Quiz Instructions</h2>
-      {questions.map((question, index) => (
-        <div key={question.id} className='card mb-3'>
+      {questions.map((question: Question, index: number) => (
+        <div
+          key={question._id}
+          className={`card mb-3 ${
+            incorrectQuestions.includes(question._id) ? 'border-danger' : ''
+          }`}
+        >
           <div className='card-header d-flex justify-content-between'>
             <h3>Question {index + 1}</h3>
-            <span>1 pts</span>
+            <span>{question.points} pts</span>
           </div>
           <div className='card-body'>
+            <h4>{question.title}</h4>
             <p>{question.text}</p>
             {question.type === 'multiple-choice' && (
               <div className='list-group'>
@@ -94,10 +203,10 @@ export default function QuizPreview () {
                   >
                     <input
                       type='radio'
-                      name={`question-${question.id}`}
+                      name={`question-${question._id}`}
                       value={option}
-                      checked={answers[question.id] === option}
-                      onChange={() => handleAnswerChange(question.id, option)}
+                      checked={answers[question._id] === option}
+                      onChange={() => handleAnswerChange(question._id, option)}
                       className='me-2'
                     />
                     {option}
@@ -114,10 +223,10 @@ export default function QuizPreview () {
                   >
                     <input
                       type='radio'
-                      name={`question-${question.id}`}
+                      name={`question-${question._id}`}
                       value={option}
-                      checked={answers[question.id] === option}
-                      onChange={() => handleAnswerChange(question.id, option)}
+                      checked={answers[question._id] === option}
+                      onChange={() => handleAnswerChange(question._id, option)}
                       className='me-2'
                     />
                     {option}
@@ -130,9 +239,9 @@ export default function QuizPreview () {
                 <input
                   type='text'
                   className='form-control'
-                  value={answers[question.id] || ''}
+                  value={answers[question._id] || ''}
                   onChange={e =>
-                    handleAnswerChange(question.id, e.target.value)
+                    handleAnswerChange(question._id, e.target.value)
                   }
                 />
               </div>
@@ -144,9 +253,15 @@ export default function QuizPreview () {
         <button onClick={handleEditQuiz} className='btn btn-secondary'>
           Keep Editing This Quiz
         </button>
-        <button onClick={handleSubmit} className='btn btn-danger'>
-          Submit Quiz
-        </button>
+        {quizDetails?.multipleAttempts && attemptsLeft !== null ? (
+          <button onClick={handleRetakeQuiz} className='btn btn-warning'>
+            Retake Quiz (Attempts left: {attemptsLeft})
+          </button>
+        ) : (
+          <button onClick={handleSubmit} className='btn btn-danger'>
+            Submit Quiz
+          </button>
+        )}
       </div>
     </div>
   )

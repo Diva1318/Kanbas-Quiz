@@ -37,7 +37,7 @@ export default function QuizQuestionEditor () {
               <input
                 type='text'
                 className='form-control'
-                placeholder='Quiz Title'
+                placeholder='Quesion Title'
               />
             </div>
 

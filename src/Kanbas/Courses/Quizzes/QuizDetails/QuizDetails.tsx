@@ -16,6 +16,7 @@ export default function QuizDetails () {
     try {
       if (qid !== 'New') {
         const quiz = await client.findQuiz(cid as string, qid as string)
+        console.log('Fetched quiz:', quiz) // Debug log
         dispatch(setQuizzes([quiz]))
       }
     } catch (err: any) {
@@ -27,14 +28,24 @@ export default function QuizDetails () {
 
   useEffect(() => {
     fetchQuiz()
- 
   }, [cid, qid])
 
   const quiz = useSelector((state: any) =>
     state.quizzesReducer.quizzes.find((q: any) => q._id === qid)
   )
+  console.log('Quiz from state:', quiz) // Debug log
 
+  if (loading) {
+    return <div>Loading...</div>
+  }
 
+  if (error) {
+    return <div>Error: {error}</div>
+  }
+
+  if (!quiz) {
+    return <div>No quiz found</div>
+  }
 
   return (
     <div id='wd-quizzes'>
@@ -45,7 +56,7 @@ export default function QuizDetails () {
         <Link
           id='wd-preview-btn'
           className='btn btn-lg btn-secondary me-1 text-center'
-          to={`/Kanbas/Courses/${cid}/Quizzes/${qid}/preview`}
+          to={`/Kanbas/Courses/${cid}/Quizzes/${qid}/questions`}
         >
           Preview
         </Link>
@@ -95,7 +106,7 @@ export default function QuizDetails () {
               </tr>
               <tr>
                 <th>Show Correct Answers</th>
-                <td>{quiz.showCorrectAnswers}</td>
+                <td>{quiz.showCorrectAnswers ? "Yes" : "No"}</td>
               </tr>
               <tr>
                 <th>One Question at a Time</th>
