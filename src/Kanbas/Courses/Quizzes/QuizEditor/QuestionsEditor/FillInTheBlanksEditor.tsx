@@ -1,15 +1,37 @@
-import { useState } from 'react'
+import React, { useState } from 'react'
 import { FaTrash } from 'react-icons/fa6'
 import RichTextEditor from '../../../../RichTextEditor'
 
-export default function FillInTheBlanksEditor () {
-  const [answers, setAnswers] = useState([{ text: '', isCorrect: false }])
-  const [question, setQuestion] = useState('')
-  const [points, setPoints] = useState(0)
+interface Question {
+  title: string
+  _id: string
+  text: string
+  points: number
+  type: 'multiple-choice' | 'fill-in-the-blank' | 'true-false'
+  options?: string[]
+  answers: string[]
+}
 
-  const handleQuestionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setQuestion(e.target.value)
-  }
+interface Answer {
+  text: string
+  isCorrect: boolean
+}
+
+interface FillInTheBlanksEditorProps {
+  question: Question
+}
+
+export default function FillInTheBlanksEditor ({
+  question: initialQuestion
+}: FillInTheBlanksEditorProps) {
+  const [answers, setAnswers] = useState<Answer[]>(
+    initialQuestion.answers.map(answer => ({
+      text: answer,
+      isCorrect: false
+    })) || [{ text: '', isCorrect: false }]
+  )
+  const [questionText, setQuestionText] = useState(initialQuestion.text || '')
+  const [points, setPoints] = useState(initialQuestion.points || 0)
 
   const handlePointsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setPoints(Number(e.target.value))
@@ -40,22 +62,23 @@ export default function FillInTheBlanksEditor () {
     setAnswers(answers.filter((_, i) => i !== index))
   }
 
+  const handleEditorChange = (value: string) => {
+    setQuestionText(value)
+  }
+
   return (
     <div>
       <p>
         Enter your question text, then define all possible correct answers for
         the blank. Students will see the questions followed by a small text box
-        to type their answer. answer.
+        to type their answer.
       </p>
 
       <div className='mb-3'>
         <label htmlFor='question' className='form-label'>
           <strong>Question</strong>
         </label>
-        {/* <textarea id='question' className='form-control' /> */}
-        <RichTextEditor value={''} onChange={function (value: string): void {
-          throw new Error('Function not implemented.')
-        } } />
+        <RichTextEditor value={questionText} onChange={handleEditorChange} />
       </div>
       <div className='mb-3'>
         <label className='form-label'>Answers:</label>
@@ -79,7 +102,6 @@ export default function FillInTheBlanksEditor () {
               className='btn btn-outline-secondary'
               onClick={() => removeAnswer(index)}
             >
-              <i className='bi bi-trash'></i>
               <FaTrash />
             </button>
           </div>
@@ -92,6 +114,21 @@ export default function FillInTheBlanksEditor () {
         >
           + Add Another Answer
         </button>
+      </div>
+      <div className='mb-3'>
+        <label htmlFor='points' className='form-label'>
+          <strong>Points</strong>
+        </label>
+        <input
+          id='points'
+          type='number'
+          className='form-control'
+          placeholder='0'
+          value={points}
+          onChange={handlePointsChange}
+          min='0'
+          step='1'
+        />
       </div>
     </div>
   )

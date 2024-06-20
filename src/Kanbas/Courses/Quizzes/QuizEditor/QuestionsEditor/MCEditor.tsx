@@ -1,11 +1,39 @@
-import { useState } from 'react'
+import React, { useState } from 'react'
 import { FaTrash } from 'react-icons/fa6'
 import RichTextEditor from '../../../../RichTextEditor'
 
-export default function MCEditor () {
+interface Question {
+  title: string
+  _id: string
+  text: string
+  points: number
+  type: 'multiple-choice' | 'fill-in-the-blank' | 'true-false'
+  options?: string[]
+  answers: string[]
+}
+
+interface Answer {
+  text: string
+  isCorrect: boolean
+}
+
+interface FillInTheBlanksEditorProps {
+  question: Question
+}
+
+export default function MCEditor({
+  question: initialQuestion
+}: FillInTheBlanksEditorProps) {
   const [question, setQuestion] = useState('')
   const [points, setPoints] = useState(0)
-  const [answers, setAnswers] = useState([{ text: '', isCorrect: false }])
+  const [answers, setAnswers] = useState<Answer[]>([
+    { text: '', isCorrect: false }
+  ])
+  const [editorValue, setEditorValue] = useState('')
+
+  const handleEditorChange = (value: string) => {
+    setEditorValue(value)
+  }
 
   const handleQuestionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setQuestion(e.target.value)
@@ -52,18 +80,7 @@ export default function MCEditor () {
         <label htmlFor='question' className='form-label'>
           <strong>Description:</strong>
         </label>
-        {/* <textarea
-          id='question'
-          className='form-control'
-          value={question}
-          onChange={handleQuestionChange}
-        /> */}
-        <RichTextEditor
-          value={''}
-          onChange={function (value: string): void {
-            throw new Error('Function not implemented.')
-          }}
-        />
+        <RichTextEditor value={editorValue} onChange={handleEditorChange} />
       </div>
       <div className='mb-3'>
         <label className='form-label'>Answers:</label>
@@ -97,7 +114,6 @@ export default function MCEditor () {
               className='btn btn-outline-secondary'
               onClick={() => removeAnswer(index)}
             >
-              <i className='bi bi-trash'></i>
               <FaTrash />
             </button>
           </div>
@@ -110,6 +126,8 @@ export default function MCEditor () {
           + Add Another Answer
         </button>
       </div>
+    
     </div>
   )
 }
+

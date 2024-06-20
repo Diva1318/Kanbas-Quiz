@@ -34,6 +34,7 @@ export default function QuizPreview () {
   const [incorrectQuestions, setIncorrectQuestions] = useState<string[]>([])
   const [attemptsLeft, setAttemptsLeft] = useState<number | null>(null)
   const [quizDetails, setQuizDetails] = useState<Quiz | null>(null)
+  const [submitCount, setSubmitCount] = useState<number>(0)
 
   const questions = useSelector((state: any) =>
     state.questionsReducer.questions.filter(
@@ -106,6 +107,7 @@ export default function QuizPreview () {
     setScore(newScore)
     setIncorrectQuestions(incorrect)
     window.scrollTo({ top: 0, behavior: 'smooth' })
+
     if (quizDetails?.multipleAttempts) {
       setAttemptsLeft(prev => {
         const newAttemptsLeft = prev !== null ? prev - 1 : null
@@ -116,6 +118,8 @@ export default function QuizPreview () {
         return newAttemptsLeft
       })
     }
+
+    setSubmitCount(prevCount => prevCount + 1)
     console.log('Quiz submitted successfully:', answers, 'Score:', newScore)
   }
 
@@ -169,10 +173,23 @@ export default function QuizPreview () {
         </div>
       )}
       <h1>Quiz Preview</h1>
+      <div className='mt-4'>
+        <h3>Number of Attempts</h3>
+        <div className='progress'>
+          <div
+            className='progress-bar'
+            role='progressbar'
+            style={{ width: `${(submitCount / 3) * 100}%` }}
+            aria-valuenow={submitCount}
+            aria-valuemin={0}
+            aria-valuemax={3}
+          >
+            {submitCount}/3
+          </div>
+        </div>
+      </div>
       <div className='alert alert-info' role='alert'>
-        This is a preview of the published version of the quiz
-      {quizDetails?.multipleAttempts}
-        {attemptsLeft}
+        This is a preview of the published version of the quiz.
       </div>
       {quizDetails?.multipleAttempts && attemptsLeft !== null && (
         <div className='alert alert-warning' role='alert'>
@@ -253,13 +270,13 @@ export default function QuizPreview () {
         <button onClick={handleEditQuiz} className='btn btn-secondary'>
           Keep Editing This Quiz
         </button>
-        {quizDetails?.multipleAttempts && attemptsLeft !== null ? (
-          <button onClick={handleRetakeQuiz} className='btn btn-warning'>
-            Retake Quiz (Attempts left: {attemptsLeft})
-          </button>
-        ) : (
+        {submitCount < 3 ? (
           <button onClick={handleSubmit} className='btn btn-danger'>
             Submit Quiz
+          </button>
+        ) : (
+          <button onClick={handleRetakeQuiz} className='btn btn-warning'>
+            You Can't Retake Quiz (Attempts left: 0)
           </button>
         )}
       </div>

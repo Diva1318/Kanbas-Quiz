@@ -18,8 +18,9 @@ import { useSelector, useDispatch } from 'react-redux'
 export default function Modules () {
   const { cid } = useParams()
   const [moduleName, setModuleName] = useState('')
-  const { modules } = useSelector((state: any) => state.modulesReducer)
+  const modules = useSelector((state: any) => state.modulesReducer.modules)
   const dispatch = useDispatch()
+
   const createModule = async (module: any) => {
     const newModule = await client.createModule(cid as string, module)
     dispatch(addModule(newModule))
@@ -29,17 +30,22 @@ export default function Modules () {
     const modules = await client.findModulesForCourse(cid as string)
     dispatch(setModules(modules))
   }
+
   useEffect(() => {
     fetchModules()
-  }, [])
+  }, [cid])
 
   const removeModule = async (moduleId: string) => {
-    await client.deleteModule(moduleId)
-    dispatch(deleteModule(moduleId))
+    try {
+      await client.deleteModule(moduleId)
+      dispatch(deleteModule(moduleId))
+    } catch (error) {
+      console.error('Error deleting module:', error)
+    }
   }
 
   const saveModule = async (module: any) => {
-    const status = await client.updateModule(module)
+    await client.updateModule(module)
     dispatch(updateModule(module))
   }
 
@@ -85,7 +91,7 @@ export default function Modules () {
 
                 <ModuleControlButtons
                   moduleId={module._id}
-                  deleteModule={moduleId => removeModule(moduleId)}
+                  deleteModule={() => removeModule(module._id)}
                   editModule={() => dispatch(editModule(module._id))}
                 />
               </div>

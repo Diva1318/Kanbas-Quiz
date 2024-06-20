@@ -1,20 +1,45 @@
+import React, { useState } from 'react'
 import RichTextEditor from '../../../../RichTextEditor'
 
-export default function QuizEditorTOC () {
+interface Question {
+  title: string
+  _id: string
+  text: string
+  points: number
+  type: 'multiple-choice' | 'fill-in-the-blank' | 'true-false'
+  options?: string[]
+  answers: string[]
+}
+
+interface Answer {
+  text: string
+  isCorrect: boolean
+}
+
+interface FillInTheBlanksEditorProps {
+  question: Question
+}
+
+export default function QuizEditorTOC ({
+  question: initialQuestion
+}: FillInTheBlanksEditorProps) {
+  const [editorValue, setEditorValue] = useState('')
+
+  const handleEditorChange = (value: string) => {
+    setEditorValue(value)
+  }
+
   return (
     <div>
       <p>
-        Enter your question text, then select True or False is the correct
-        answer
+        Enter your question text, then select True or False as the correct
+        answer.
       </p>
       <div className='mb-3'>
         <label htmlFor='question' className='form-label'>
           <strong>Question:</strong>
         </label>
-        {/* <textarea id='question' className='form-control' /> */}
-        <RichTextEditor value={''} onChange={function (value: string): void {
-          throw new Error('Function not implemented.')
-        } } />
+        <RichTextEditor value={editorValue} onChange={handleEditorChange} />
       </div>
       <div className='mb-3'>
         <label className='form-label'>Answers:</label>
