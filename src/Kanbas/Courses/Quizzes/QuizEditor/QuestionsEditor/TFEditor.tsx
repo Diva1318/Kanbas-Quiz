@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import RichTextEditor from '../../../../RichTextEditor'
 
 interface Question {
@@ -6,27 +6,32 @@ interface Question {
   _id: string
   text: string
   points: number
+  description: string
   type: 'multiple-choice' | 'fill-in-the-blank' | 'true-false'
   options?: string[]
   answers: string[]
-}
-
-interface Answer {
-  text: string
-  isCorrect: boolean
 }
 
 interface FillInTheBlanksEditorProps {
   question: Question
 }
 
-export default function QuizEditorTOC ({
+export default function TFEditor ({
   question: initialQuestion
 }: FillInTheBlanksEditorProps) {
   const [editorValue, setEditorValue] = useState('')
+  const [description, setDescription] = useState(
+    initialQuestion.description || ''
+  )
+
+  useEffect(() => {
+    // Initialize the editor value with the initial description
+    setEditorValue(initialQuestion.description || '')
+  }, [initialQuestion.description])
 
   const handleEditorChange = (value: string) => {
     setEditorValue(value)
+    setDescription(value)
   }
 
   return (

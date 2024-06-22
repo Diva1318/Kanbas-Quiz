@@ -10,6 +10,7 @@ interface Question {
   _id: string
   text: string
   points: number
+  description: string
   type: 'multiple-choice' | 'fill-in-the-blank' | 'true-false'
   options?: string[]
   answers: string[]
@@ -23,10 +24,12 @@ export default function QuizQuestionEditor () {
   useEffect(() => {
     const fetchQuestions = async () => {
       try {
-        const fetchedQuestions = await client.findAllQuestionsByQuizId(qid as string)
+        const fetchedQuestions = await client.findAllQuestionsByQuizId(
+          qid as string
+        )
         setQuestions(fetchedQuestions)
       } catch (error) {
-        console.error('Error fetching questions:', error)
+        // console.error('Error fetching questions:', error)
       }
     }
 
@@ -54,6 +57,7 @@ export default function QuizQuestionEditor () {
         _id: '',
         text: '',
         points: 0,
+        description: '',
         type: 'multiple-choice',
         answers: []
       }

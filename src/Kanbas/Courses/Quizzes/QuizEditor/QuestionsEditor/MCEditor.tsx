@@ -7,6 +7,7 @@ interface Question {
   _id: string
   text: string
   points: number
+  description: string
   type: 'multiple-choice' | 'fill-in-the-blank' | 'true-false'
   options?: string[]
   answers: string[]
@@ -17,26 +18,29 @@ interface Answer {
   isCorrect: boolean
 }
 
-interface FillInTheBlanksEditorProps {
+interface MCEditorProps {
   question: Question
 }
 
-export default function MCEditor({
-  question: initialQuestion
-}: FillInTheBlanksEditorProps) {
-  const [question, setQuestion] = useState('')
-  const [points, setPoints] = useState(0)
-  const [answers, setAnswers] = useState<Answer[]>([
-    { text: '', isCorrect: false }
-  ])
-  const [editorValue, setEditorValue] = useState('')
+export default function MCEditor ({ question: initialQuestion }: MCEditorProps) {
+  const [questionText, setQuestionText] = useState(initialQuestion.text || '')
+  const [points, setPoints] = useState(initialQuestion.points || 0)
+  const [description, setDescription] = useState(
+    initialQuestion.description || ''
+  )
+  const [answers, setAnswers] = useState<Answer[]>(
+    initialQuestion.answers.map(answer => ({
+      text: answer,
+      isCorrect: false
+    })) || [{ text: '', isCorrect: false }]
+  )
 
   const handleEditorChange = (value: string) => {
-    setEditorValue(value)
+    setDescription(value)
   }
 
   const handleQuestionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setQuestion(e.target.value)
+    setQuestionText(e.target.value)
   }
 
   const handlePointsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -77,10 +81,10 @@ export default function MCEditor({
         </p>
       </div>
       <div className=''>
-        <label htmlFor='question' className='form-label'>
+        <label htmlFor='description' className='form-label'>
           <strong>Description:</strong>
         </label>
-        <RichTextEditor value={editorValue} onChange={handleEditorChange} />
+        <RichTextEditor value={description} onChange={handleEditorChange} />
       </div>
       <div className='mb-3'>
         <label className='form-label'>Answers:</label>
@@ -106,7 +110,6 @@ export default function MCEditor({
               }`}
               onClick={() => handleCorrectChange(index)}
             >
-              <i className='bi bi-check'></i>
               Correct answer
             </button>
             <button
@@ -125,9 +128,7 @@ export default function MCEditor({
         >
           + Add Another Answer
         </button>
-      </div>
-    
+      </div>  
     </div>
   )
 }
-

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { FaTrash } from 'react-icons/fa6'
 import RichTextEditor from '../../../../RichTextEditor'
 
@@ -7,6 +7,7 @@ interface Question {
   _id: string
   text: string
   points: number
+  description: string
   type: 'multiple-choice' | 'fill-in-the-blank' | 'true-false'
   options?: string[]
   answers: string[]
@@ -32,6 +33,9 @@ export default function FillInTheBlanksEditor ({
   )
   const [questionText, setQuestionText] = useState(initialQuestion.text || '')
   const [points, setPoints] = useState(initialQuestion.points || 0)
+  const [description, setDescription] = useState(
+    initialQuestion.description || ''
+  )
 
   const handlePointsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setPoints(Number(e.target.value))
@@ -63,7 +67,7 @@ export default function FillInTheBlanksEditor ({
   }
 
   const handleEditorChange = (value: string) => {
-    setQuestionText(value)
+    setDescription(value)
   }
 
   return (
@@ -75,10 +79,10 @@ export default function FillInTheBlanksEditor ({
       </p>
 
       <div className='mb-3'>
-        <label htmlFor='question' className='form-label'>
-          <strong>Question</strong>
+        <label htmlFor='description' className='form-label'>
+          <strong>Description</strong>
         </label>
-        <RichTextEditor value={questionText} onChange={handleEditorChange} />
+        <RichTextEditor value={description} onChange={handleEditorChange} />
       </div>
       <div className='mb-3'>
         <label className='form-label'>Answers:</label>
@@ -115,21 +119,7 @@ export default function FillInTheBlanksEditor ({
           + Add Another Answer
         </button>
       </div>
-      <div className='mb-3'>
-        <label htmlFor='points' className='form-label'>
-          <strong>Points</strong>
-        </label>
-        <input
-          id='points'
-          type='number'
-          className='form-control'
-          placeholder='0'
-          value={points}
-          onChange={handlePointsChange}
-          min='0'
-          step='1'
-        />
-      </div>
+  
     </div>
   )
 }

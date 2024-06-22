@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
 import * as client from '../client'
-import { addQuizzes, setQuizzes } from '../reducer'
+import { addQuizzes } from '../reducer'
 import { MdDoNotDisturbAlt } from 'react-icons/md'
 import RichTextEditor from '../../../RichTextEditor'
 
@@ -32,15 +32,14 @@ export default function QuizDetailsEditor () {
     points: ''
   })
 
-  const formatDate = (dateString: any) => {
-    if (!dateString) return ''
-    const date = new Date(dateString)
-    const year = date.getFullYear()
-    const month = String(date.getMonth() + 1).padStart(2, '0')
-    const day = String(date.getDate()).padStart(2, '0')
-    const hours = String(date.getHours()).padStart(2, '0')
-    const minutes = String(date.getMinutes()).padStart(2, '0')
-    return `${year}-${month}-${day}T${hours}:${minutes}`
+  const formatDateForInput = (dateString: string) => {
+    try {
+      const date = new Date(dateString)
+      return date.toISOString().slice(0, 16)
+    } catch (error) {
+      console.error('Error formatting date for input:', error)
+      return dateString
+    }
   }
 
   const fetchQuizDetails = async () => {
@@ -63,9 +62,9 @@ export default function QuizDetailsEditor () {
           },
           accessCode: quiz.accessCode || '',
           assignTo: quiz.assignTo || '',
-          dueDate: formatDate(quiz.dueDate),
-          availableDate: formatDate(quiz.availableDate),
-          untilDate: formatDate(quiz.untilDate),
+          dueDate: formatDateForInput(quiz.dueDate),
+          availableDate: formatDateForInput(quiz.availableDate),
+          untilDate: formatDateForInput(quiz.untilDate),
           points: quiz.points || ''
         })
       }
@@ -349,7 +348,7 @@ export default function QuizDetailsEditor () {
                       type='datetime-local'
                       id='dueDate'
                       name='dueDate'
-                      value={quizDetails.dueDate?.slice(0, 16)}
+                      value={quizDetails.dueDate}
                       onChange={handleChange}
                       className='form-control'
                     />
@@ -366,7 +365,7 @@ export default function QuizDetailsEditor () {
                       type='datetime-local'
                       id='availableDate'
                       name='availableDate'
-                      value={quizDetails.availableDate?.slice(0, 16)}
+                      value={quizDetails.availableDate}
                       onChange={handleChange}
                       className='form-control'
                     />
@@ -383,7 +382,7 @@ export default function QuizDetailsEditor () {
                       type='datetime-local'
                       id='untilDate'
                       name='untilDate'
-                      value={quizDetails.untilDate?.slice(0, 16)}
+                      value={quizDetails.untilDate}
                       onChange={handleChange}
                       className='form-control'
                     />

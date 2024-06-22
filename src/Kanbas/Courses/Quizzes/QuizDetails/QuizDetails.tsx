@@ -5,6 +5,8 @@ import * as client from '../client'
 import { setQuizzes } from '../reducer'
 import { useDispatch, useSelector } from 'react-redux'
 import { useEffect, useState } from 'react'
+import { current } from '@reduxjs/toolkit'
+import { format } from 'date-fns'
 
 export default function QuizDetails () {
   const { cid, qid } = useParams()
@@ -33,7 +35,20 @@ export default function QuizDetails () {
   const quiz = useSelector((state: any) =>
     state.quizzesReducer.quizzes.find((q: any) => q._id === qid)
   )
+
+  const formatDate = (dateString: string) => {
+    try {
+      const date = new Date(dateString)
+      return format(date, "MMM d 'at' h a")
+    } catch (error) {
+      console.error('Error formatting date:', error)
+      return dateString
+    }
+  }
+
   console.log('Quiz from state:', quiz) // Debug log
+  const { currentUser } = useSelector((state: any) => state.accountReducer)
+  console.log('USER ' + currentUser.role)
 
   if (loading) {
     return <div>Loading...</div>
@@ -47,27 +62,43 @@ export default function QuizDetails () {
     return <div>No quiz found</div>
   }
 
+  if (!currentUser) {
+    return <div>No user logged in</div>
+  }
+
   return (
     <div id='wd-quizzes'>
       <div
         id='wd-quiz-control-buttons'
         className='text-nowrap align-self-center'
       >
-        <Link
-          id='wd-preview-btn'
-          className='btn btn-lg btn-secondary me-1 text-center'
-          to={`/Kanbas/Courses/${cid}/Quizzes/${qid}/questions`}
-        >
-          Preview
-        </Link>
-        <Link
-          id='wd-quiz-edit-btn'
-          className='btn btn-lg btn-secondary me-1 text-center'
-          to={`/Kanbas/Courses/${cid}/Quizzes/${qid}/editor`}
-        >
-          <MdOutlineModeEditOutline />
-          Edit
-        </Link>
+        {currentUser.role === 'STUDENT' ? (
+          <Link
+            id='wd-take-quiz-btn'
+            className='btn btn-lg btn-primary me-1 text-center'
+            to={`/Kanbas/Courses/${cid}/Quizzes/${qid}/questions`}
+          >
+            Take Quiz
+          </Link>
+        ) : (
+          <>
+            <Link
+              id='wd-preview-btn'
+              className='btn btn-lg btn-secondary me-1 text-center'
+              to={`/Kanbas/Courses/${cid}/Quizzes/${qid}/questions`}
+            >
+              Preview
+            </Link>
+            <Link
+              id='wd-quiz-edit-btn'
+              className='btn btn-lg btn-secondary me-1 text-center'
+              to={`/Kanbas/Courses/${cid}/Quizzes/${qid}/editor`}
+            >
+              <MdOutlineModeEditOutline />
+              Edit
+            </Link>
+          </>
+        )}
       </div>
       <br />
       <hr />
@@ -106,7 +137,7 @@ export default function QuizDetails () {
               </tr>
               <tr>
                 <th>Show Correct Answers</th>
-                <td>{quiz.showCorrectAnswers ? "Yes" : "No"}</td>
+                <td>{quiz.showCorrectAnswers ? 'Yes' : 'No'}</td>
               </tr>
               <tr>
                 <th>One Question at a Time</th>
@@ -143,10 +174,10 @@ export default function QuizDetails () {
             </thead>
             <tbody>
               <tr>
-                <td>{quiz.dueDate}</td>
+                <td>{formatDate(quiz.dueDate)}</td>
                 <td>Everyone</td>
-                <td>{quiz.availableDate}</td>
-                <td>{quiz.untilDate}</td>
+                <td>{formatDate(quiz.availableDate)}</td>
+                <td>{formatDate(quiz.untilDate)}</td>
               </tr>
             </tbody>
           </table>
