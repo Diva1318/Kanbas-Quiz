@@ -1,15 +1,18 @@
+
 import { MdOutlineModeEditOutline } from 'react-icons/md'
-import { Link, useParams } from 'react-router-dom'
+import { Link, useParams, useNavigate } from 'react-router-dom'
 import './index.css'
 import * as client from '../client'
 import { setQuizzes } from '../reducer'
 import { useDispatch, useSelector } from 'react-redux'
 import { useEffect, useState } from 'react'
-import { current } from '@reduxjs/toolkit'
 import { format } from 'date-fns'
+import { AiOutlineStop } from 'react-icons/ai'
+import { FaPlus, FaArrowLeft } from 'react-icons/fa6'
 
 export default function QuizDetails () {
   const { cid, qid } = useParams()
+  const navigate = useNavigate()
   const dispatch = useDispatch()
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -25,6 +28,18 @@ export default function QuizDetails () {
       setError(err.message)
     } finally {
       setLoading(false)
+    }
+  }
+
+  const togglePublish = async () => {
+    if (!quiz) return
+
+    const updatedQuiz = { ...quiz, published: !quiz.published }
+    try {
+      await client.updateQuiz(updatedQuiz)
+      dispatch(setQuizzes([updatedQuiz]))
+    } catch (err: any) {
+      setError(err.message)
     }
   }
 
@@ -68,6 +83,9 @@ export default function QuizDetails () {
 
   return (
     <div id='wd-quizzes'>
+      <button className='btn btn-secondary mb-3' onClick={() => navigate(-1)}>
+        <FaArrowLeft /> Go Back
+      </button>
       <div
         id='wd-quiz-control-buttons'
         className='text-nowrap align-self-center'
@@ -82,6 +100,16 @@ export default function QuizDetails () {
           </Link>
         ) : (
           <>
+            <button
+              id='wd-publish-btn'
+              className={`btn btn-lg me-1 ${
+                quiz.published ? 'btn-success' : 'btn-danger'
+              }`}
+              onClick={togglePublish}
+            >
+              {quiz.published ? <FaPlus /> : <AiOutlineStop />}
+              {quiz.published ? ' Published' : ' Unpublished'}
+            </button>
             <Link
               id='wd-preview-btn'
               className='btn btn-lg btn-secondary me-1 text-center'
@@ -131,6 +159,12 @@ export default function QuizDetails () {
                 <th>Multiple Attempts</th>
                 <td>{quiz.multipleAttempts ? 'Yes' : 'No'}</td>
               </tr>
+              {quiz.multipleAttempts && (
+                <tr>
+                  <th>Attempts Allowed</th>
+                  <td>{quiz.attempts}</td>
+                </tr>
+              )}
               <tr>
                 <th>View Responses</th>
                 <td>Always</td>

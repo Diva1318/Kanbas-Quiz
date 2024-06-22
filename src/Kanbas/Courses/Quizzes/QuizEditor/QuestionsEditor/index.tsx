@@ -4,6 +4,7 @@ import MCEditor from './MCEditor'
 import TFEditor from './TFEditor'
 import * as client from '../../QuestionClient' // Adjust the import as necessary
 import { useParams } from 'react-router'
+import { FaTrash } from 'react-icons/fa6'
 
 interface Question {
   title: string
@@ -64,8 +65,20 @@ export default function QuizQuestionEditor () {
     ])
   }
 
-  const handleSaveChanges = () => {
-    // Logic to save changes
+  const handleSaveChanges = async () => {
+    try {
+      await Promise.all(
+        questions.map(question =>
+          question._id
+            ? client.updateQuestion(question)
+            : client.createQuestion(qid as string, question)
+        )
+      )
+      alert('Changes saved successfully!')
+    } catch (error) {
+      console.error('Error saving changes:', error)
+      alert('Failed to save changes. Please try again.')
+    }
   }
 
   if (questions.length === 0) {
@@ -80,6 +93,10 @@ export default function QuizQuestionEditor () {
         </button>
       </div>
     )
+  }
+
+  function handleDeleteClick (_id: any) {
+    throw new Error('Function not implemented.')
   }
 
   return (
@@ -140,6 +157,12 @@ export default function QuizQuestionEditor () {
                 min='0'
                 step='1'
               />
+              <div className='ms-3'>
+                <FaTrash
+                  className='text-danger'
+                  onClick={() => handleDeleteClick(question._id)}
+                />
+              </div>
             </div>
           </div>
           <div className='card-body'>{renderEditor(question)}</div>

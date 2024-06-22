@@ -23,6 +23,7 @@
 // interface Quiz {
 //   title: string
 //   multipleAttempts: boolean
+//   numberOfAttempts: number
 // }
 
 // export default function QuizPreview () {
@@ -35,6 +36,9 @@
 //   const [attemptsLeft, setAttemptsLeft] = useState<number | null>(null)
 //   const [quizDetails, setQuizDetails] = useState<Quiz | null>(null)
 //   const [submitCount, setSubmitCount] = useState<number>(0)
+//   const [timeLeft, setTimeLeft] = useState<number>(60) // Timer set to 1 minute
+//   const [timer, setTimer] = useState<NodeJS.Timeout | null>(null) // Timer reference
+//   const [scores, setScores] = useState<number[]>([]) // Scores for each attempt
 
 //   const { currentUser } = useSelector((state: any) => state.accountReducer)
 
@@ -77,7 +81,11 @@
 //         const savedAttemptsLeft = localStorage.getItem(
 //           `quiz-${qid}-attemptsLeft`
 //         )
-//         setAttemptsLeft(savedAttemptsLeft ? parseInt(savedAttemptsLeft) : 3)
+//         setAttemptsLeft(
+//           savedAttemptsLeft
+//             ? parseInt(savedAttemptsLeft)
+//             : fetchedQuizDetails.numberOfAttempts
+//         )
 //       } else {
 //         setAttemptsLeft(1)
 //       }
@@ -90,6 +98,18 @@
 //     fetchQuestions()
 //     fetchQuizDetails()
 //   }, [qid])
+
+//   useEffect(() => {
+//     if (timeLeft > 0) {
+//       const timerInterval = setInterval(() => {
+//         setTimeLeft(prevTime => prevTime - 1)
+//       }, 1000)
+//       setTimer(timerInterval)
+//       return () => clearInterval(timerInterval)
+//     } else {
+//       handleSubmit()
+//     }
+//   }, [timeLeft])
 
 //   const handleAnswerChange = (questionId: string, answer: string) => {
 //     setAnswers({
@@ -109,6 +129,7 @@
 //       }
 //     })
 //     setScore(newScore)
+//     setScores([...scores, newScore]) // Store the new score
 //     setIncorrectQuestions(incorrect)
 //     window.scrollTo({ top: 0, behavior: 'smooth' })
 
@@ -127,6 +148,15 @@
 
 //     setSubmitCount(prevCount => prevCount + 1)
 //     console.log('Quiz submitted successfully:', answers, 'Score:', newScore)
+
+//     // Stop the timer
+//     if (timer) {
+//       clearInterval(timer)
+//       setTimer(null)
+//     }
+
+//     // Restart the timer
+//     setTimeLeft(60)
 //   }
 
 //   const handleRetakeQuiz = () => {
@@ -179,6 +209,10 @@
 //         </div>
 //       )}
 //       <h1>{quizDetails?.title}</h1>
+//       <div className='alert alert-info' role='alert'>
+//         Time left: {Math.floor(timeLeft / 60)}:
+//         {timeLeft % 60 < 10 ? `0${timeLeft % 60}` : timeLeft % 60}
+//       </div>
 //       {quizDetails?.multipleAttempts ? (
 //         attemptsLeft !== null && attemptsLeft > 0 ? (
 //           <div className='alert alert-warning' role='alert'>
@@ -275,7 +309,9 @@
 //             Keep Editing This Quiz
 //           </button>
 //         )}
-//         {attemptsLeft !== null && attemptsLeft > 0 ? (
+//         {submitCount <
+//           (quizDetails?.multipleAttempts ? quizDetails.numberOfAttempts : 1) &&
+//         timeLeft > 0 ? (
 //           <button onClick={handleSubmit} className='btn btn-danger'>
 //             Submit Quiz
 //           </button>
@@ -289,6 +325,18 @@
 //           </button>
 //         )}
 //       </div>
+//       {scores.length > 0 && (
+//         <div className='mt-5'>
+//           <h3>Scores for Each Attempt</h3>
+//           <ul className='list-group'>
+//             {scores.map((score, index) => (
+//               <li key={index} className='list-group-item'>
+//                 Attempt {index + 1}: {score} points
+//               </li>
+//             ))}
+//           </ul>
+//         </div>
+//       )}
 //     </div>
 //   )
 // }
@@ -317,6 +365,7 @@ interface Answers {
 interface Quiz {
   title: string
   multipleAttempts: boolean
+  numberOfAttempts: number
 }
 
 export default function QuizPreview () {
@@ -330,6 +379,8 @@ export default function QuizPreview () {
   const [quizDetails, setQuizDetails] = useState<Quiz | null>(null)
   const [submitCount, setSubmitCount] = useState<number>(0)
   const [timeLeft, setTimeLeft] = useState<number>(60) // Timer set to 1 minute
+  const [timer, setTimer] = useState<NodeJS.Timeout | null>(null) // Timer reference
+  const [scores, setScores] = useState<number[]>([]) // Scores for each attempt
 
   const { currentUser } = useSelector((state: any) => state.accountReducer)
 
@@ -372,7 +423,11 @@ export default function QuizPreview () {
         const savedAttemptsLeft = localStorage.getItem(
           `quiz-${qid}-attemptsLeft`
         )
-        setAttemptsLeft(savedAttemptsLeft ? parseInt(savedAttemptsLeft) : 3)
+        setAttemptsLeft(
+          savedAttemptsLeft
+            ? parseInt(savedAttemptsLeft)
+            : fetchedQuizDetails.numberOfAttempts
+        )
       } else {
         setAttemptsLeft(1)
       }
@@ -388,12 +443,13 @@ export default function QuizPreview () {
 
   useEffect(() => {
     if (timeLeft > 0) {
-      const timer = setInterval(() => {
-        setTimeLeft(timeLeft - 1)
+      const timerInterval = setInterval(() => {
+        setTimeLeft(prevTime => prevTime - 1)
       }, 1000)
-      return () => clearInterval(timer)
+      setTimer(timerInterval)
+      return () => clearInterval(timerInterval)
     } else {
-      alert("Time's up! You can no longer submit the quiz.")
+      handleSubmit()
     }
   }, [timeLeft])
 
@@ -415,6 +471,7 @@ export default function QuizPreview () {
       }
     })
     setScore(newScore)
+    setScores([...scores, newScore]) // Store the new score
     setIncorrectQuestions(incorrect)
     window.scrollTo({ top: 0, behavior: 'smooth' })
 
@@ -433,6 +490,15 @@ export default function QuizPreview () {
 
     setSubmitCount(prevCount => prevCount + 1)
     console.log('Quiz submitted successfully:', answers, 'Score:', newScore)
+
+    // Stop the timer
+    if (timer) {
+      clearInterval(timer)
+      setTimer(null)
+    }
+
+    // Restart the timer
+    setTimeLeft(60)
   }
 
   const handleRetakeQuiz = () => {
@@ -585,7 +651,7 @@ export default function QuizPreview () {
             Keep Editing This Quiz
           </button>
         )}
-        {submitCount < 3 && timeLeft > 0 ? (
+        {submitCount < (quizDetails?.numberOfAttempts || 1) && timeLeft > 0 ? (
           <button onClick={handleSubmit} className='btn btn-danger'>
             Submit Quiz
           </button>
@@ -599,6 +665,18 @@ export default function QuizPreview () {
           </button>
         )}
       </div>
+      {scores.length > 0 && (
+        <div className='mt-5'>
+          <h3>Scores for Each Attempt</h3>
+          <ul className='list-group'>
+            {scores.map((score, index) => (
+              <li key={index} className='list-group-item'>
+                Attempt {index + 1}: {score} points
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
     </div>
   )
 }

@@ -1,4 +1,5 @@
-import React, { useState } from 'react'
+
+import React, { useState, useEffect } from 'react'
 import { FaTrash } from 'react-icons/fa6'
 import RichTextEditor from '../../../../RichTextEditor'
 
@@ -29,11 +30,16 @@ export default function MCEditor ({ question: initialQuestion }: MCEditorProps) 
     initialQuestion.description || ''
   )
   const [answers, setAnswers] = useState<Answer[]>(
-    initialQuestion.answers.map(answer => ({
-      text: answer,
-      isCorrect: false
+    initialQuestion.options?.map(option => ({
+      text: option,
+      isCorrect: initialQuestion.answers.includes(option)
     })) || [{ text: '', isCorrect: false }]
   )
+
+  useEffect(() => {
+    console.log('Initial Options:', initialQuestion.options)
+    console.log('State Answers:', answers)
+  }, [initialQuestion, answers])
 
   const handleEditorChange = (value: string) => {
     setDescription(value)
@@ -59,7 +65,7 @@ export default function MCEditor ({ question: initialQuestion }: MCEditorProps) 
   const handleCorrectChange = (index: number) => {
     const newAnswers = answers.map((answer, i) => ({
       ...answer,
-      isCorrect: i === index
+      isCorrect: i === index ? !answer.isCorrect : false
     }))
     setAnswers(newAnswers)
   }
@@ -128,7 +134,7 @@ export default function MCEditor ({ question: initialQuestion }: MCEditorProps) 
         >
           + Add Another Answer
         </button>
-      </div>  
+      </div>
     </div>
   )
 }
