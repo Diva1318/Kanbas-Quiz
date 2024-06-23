@@ -101,12 +101,12 @@ export default function Quiz () {
           <div className='d-flex'>
             <Link
               to={`/Kanbas/Courses/${cid}/Quizzes/New`}
-              className='btn btn-danger'
+              className='btn btn-danger me-2'
             >
               <FaPlus className='me-1' />
               Quiz
             </Link>
-            <button className='btn btn-secondary btn-lg me-2'>
+            <button className='btn btn-secondary me-2'>
               <IoEllipsisVertical className='fs-4' />
             </button>
           </div>
