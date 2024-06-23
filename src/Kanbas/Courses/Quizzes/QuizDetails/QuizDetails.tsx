@@ -281,25 +281,28 @@ export default function QuizDetails () {
   const { currentUser } = useSelector((state: any) => state.accountReducer)
   console.log('USER ' + currentUser.role)
 
-  if (loading) {
-    return <div>Loading...</div>
-  }
+  // if (loading) {
+  //   return <div>Loading...</div>
+  // }
 
-  if (error) {
-    return <div>Error: {error}</div>
-  }
+  // if (error) {
+  //   return <div>Error: {error}</div>
+  // }
 
-  if (!quiz) {
-    return <div>No quiz found</div>
-  }
+  // if (!quiz) {
+  //   return <div>No quiz found</div>
+  // }
 
-  if (!currentUser) {
-    return <div>No user logged in</div>
-  }
+  // if (!currentUser) {
+  //   return <div>No user logged in</div>
+  // }
 
   return (
     <div id='wd-quizzes'>
-      <button className='btn btn-secondary mb-3' onClick={() => navigate(`/Kanbas/Courses/${cid}/Quizzes/`)}>
+      <button
+        className='btn btn-secondary mb-3'
+        onClick={() => navigate(`/Kanbas/Courses/${cid}/Quizzes/`)}
+      >
         <FaArrowLeft /> Go Back
       </button>
       <div

@@ -28,7 +28,7 @@ export default function FillInTheBlanksEditor ({
   const [answers, setAnswers] = useState<Answer[]>(
     initialQuestion.answers.map(answer => ({
       text: answer,
-      isCorrect: false
+      isCorrect: true
     })) || [{ text: '', isCorrect: false }]
   )
   const [questionText, setQuestionText] = useState(initialQuestion.text || '')
@@ -119,7 +119,6 @@ export default function FillInTheBlanksEditor ({
           + Add Another Answer
         </button>
       </div>
-  
     </div>
   )
 }

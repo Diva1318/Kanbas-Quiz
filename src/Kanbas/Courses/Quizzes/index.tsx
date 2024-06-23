@@ -10,29 +10,38 @@ import { addQuizzes, deleteQuizzes, updateQuizzes, setQuizzes } from './reducer'
 import * as client from './client'
 import { useEffect, useState } from 'react'
 import { format } from 'date-fns'
+import { AiOutlineStop } from 'react-icons/ai'
+import { MdOutlineModeEditOutline } from 'react-icons/md' // Import edit icon
 
 const defaultDate = new Date().toISOString().split('T')[0]
 
 export default function Quiz () {
   const { cid } = useParams()
+  const dispatch = useDispatch()
+
   const quizzes = useSelector((state: any) =>
     state.quizzesReducer.quizzes.filter((quiz: any) => quiz.course === cid)
   )
-  const dispatch = useDispatch()
+
   const { currentUser } = useSelector((state: any) => state.accountReducer)
   const userRole = currentUser.role
 
   const fetchQuizzes = async () => {
-    const quizzes = await client.findQuizzesForCourse(cid as string)
-    dispatch(setQuizzes(quizzes))
+    try {
+      const quizzes = await client.findQuizzesForCourse(cid as string)
+      dispatch(setQuizzes(quizzes))
+    } catch (error) {
+      console.error('Error fetching quizzes:', error)
+    }
   }
 
   useEffect(() => {
     fetchQuizzes()
-  }, [cid])
+  }, [cid, dispatch])
 
   const [showModal, setShowModal] = useState(false)
   const [selectedQuizId, setSelectedQuizId] = useState<string | null>(null)
+  const [showPopup, setShowPopup] = useState<{ [key: string]: boolean }>({}) // State for popup menu
 
   const handleDeleteClick = (quizId: string) => {
     setSelectedQuizId(quizId)
@@ -63,21 +72,17 @@ export default function Quiz () {
     setSelectedQuizId(null)
   }
 
-  // const handleCreateQuiz = async () => {
-  //   try {
-  //     const newQuiz = {
-  //       title: 'New Quiz',
-  //       course: cid,
-  //       availableFrom: new Date().toISOString(),
-  //       dueDate: new Date().toISOString(),
-  //       points: 0
-  //     }
-  //     const createdQuiz = await client.createQuizzes(cid as string, newQuiz)
-  //     dispatch(addQuizzes(createdQuiz))
-  //   } catch (error) {
-  //     console.error('Error creating quiz:', error)
-  //   }
-  // }
+  const togglePopup = (quizId: string) => {
+    setShowPopup(prev => ({
+      ...prev,
+      [quizId]: !prev[quizId]
+    }))
+  }
+
+  const filteredQuizzes =
+    userRole === 'STUDENT'
+      ? quizzes.filter((quiz: any) => quiz.published)
+      : quizzes
 
   return (
     <div id='wd-quiz-list' className='container'>
@@ -95,13 +100,13 @@ export default function Quiz () {
         {userRole === 'FACULTY' && (
           <div className='d-flex'>
             <Link
-              className='btn btn-danger'
               to={`/Kanbas/Courses/${cid}/Quizzes/New`}
+              className='btn btn-danger'
             >
               <FaPlus className='me-1' />
               Quiz
             </Link>
-            <button className='btn btn-secondary btn-light me-2'>
+            <button className='btn btn-secondary btn-lg me-2'>
               <IoEllipsisVertical className='fs-4' />
             </button>
           </div>
@@ -120,7 +125,7 @@ export default function Quiz () {
           </h3>
 
           <div id='wd-quiz-list' className='list-group rounded-0'>
-            {quizzes.map((quiz: any) => (
+            {filteredQuizzes.map((quiz: any) => (
               <li
                 key={quiz._id}
                 className='wd-quiz-list-item list-group-item p-3 ps-1'
@@ -152,13 +157,37 @@ export default function Quiz () {
                     </span>
                   </div>
                   {userRole === 'FACULTY' && (
-                    <div className='d-flex'>
-                      <FaCheckCircle className='text-success me-2' />
-                      <FaTrash
-                        className='text-danger me-2'
-                        onClick={() => handleDeleteClick(quiz._id)}
+                    <div className='d-flex position-relative'>
+                      <div className='d-flex'>
+                        {quiz.published ? (
+                          <FaCheckCircle className='text-success me-2' />
+                        ) : (
+                          <AiOutlineStop className='text-danger me-2' />
+                        )}
+                      </div>
+                      <IoEllipsisVertical
+                        className='fs-5'
+                        onClick={() => togglePopup(quiz._id)}
                       />
-                      <IoEllipsisVertical className='fs-5' />
+                      {showPopup[quiz._id] && (
+                        <div className='popup-menu position-absolute'>
+                          <Link
+                            id='wd-quiz-edit-btn'
+                            className='dropdown-item'
+                            to={`/Kanbas/Courses/${cid}/Quizzes/${quiz._id}/editor`}
+                          >
+                            <MdOutlineModeEditOutline />
+                            Edit
+                          </Link>
+                          <button
+                            className='dropdown-item text-danger'
+                            onClick={() => handleDeleteClick(quiz._id)}
+                          >
+                            <FaTrash />
+                            Delete
+                          </button>
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
