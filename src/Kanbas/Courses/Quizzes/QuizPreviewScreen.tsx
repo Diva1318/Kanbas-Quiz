@@ -309,9 +309,7 @@
 //             Keep Editing This Quiz
 //           </button>
 //         )}
-//         {submitCount <
-//           (quizDetails?.multipleAttempts ? quizDetails.numberOfAttempts : 1) &&
-//         timeLeft > 0 ? (
+//         {submitCount < (quizDetails?.numberOfAttempts || 1) && timeLeft > 0 ? (
 //           <button onClick={handleSubmit} className='btn btn-danger'>
 //             Submit Quiz
 //           </button>
@@ -365,7 +363,7 @@ interface Answers {
 interface Quiz {
   title: string
   multipleAttempts: boolean
-  numberOfAttempts: number
+  attemptsAllowed: number
 }
 
 export default function QuizPreview () {
@@ -426,7 +424,7 @@ export default function QuizPreview () {
         setAttemptsLeft(
           savedAttemptsLeft
             ? parseInt(savedAttemptsLeft)
-            : fetchedQuizDetails.numberOfAttempts
+            : fetchedQuizDetails.attemptsAllowed
         )
       } else {
         setAttemptsLeft(1)
@@ -651,7 +649,7 @@ export default function QuizPreview () {
             Keep Editing This Quiz
           </button>
         )}
-        {submitCount < (quizDetails?.numberOfAttempts || 1) && timeLeft > 0 ? (
+        {submitCount < (quizDetails?.attemptsAllowed || 1) && timeLeft > 0 ? (
           <button onClick={handleSubmit} className='btn btn-danger'>
             Submit Quiz
           </button>
@@ -669,11 +667,13 @@ export default function QuizPreview () {
         <div className='mt-5'>
           <h3>Scores for Each Attempt</h3>
           <ul className='list-group'>
-            {scores.map((score, index) => (
-              <li key={index} className='list-group-item'>
-                Attempt {index + 1}: {score} points
-              </li>
-            ))}
+            {scores
+              .slice(0, quizDetails?.attemptsAllowed || 1)
+              .map((score, index) => (
+                <li key={index} className='list-group-item'>
+                  Attempt {index + 1}: {score} points
+                </li>
+              ))}
           </ul>
         </div>
       )}

@@ -2,7 +2,6 @@ import axios from 'axios';
 const REMOTE_SERVER = process.env.REACT_APP_REMOTE_SERVER;
 const COURSES_API = `${REMOTE_SERVER}/api/courses`;
 const QUIZZES_API = `${REMOTE_SERVER}/api/quizzes`;
-const QUESTIONS_API = `${REMOTE_SERVER}/api/questions`;
 
 
 export const deleteQuiz = async (quizID : string) => {
@@ -10,22 +9,16 @@ export const deleteQuiz = async (quizID : string) => {
   return response.data;
 };
 
-export const createQuizzes = async (courseId : string, quiz : any) => {
+export const createQuizzes = async (courseId: string, quiz: any) => {
   const response = await axios.post(`${COURSES_API}/${courseId}/quizzes`, quiz);
   return response.data;
 };
+
 
 export const findQuizzesForCourse = async (courseId : string) => {
   const response = await axios.get(`${COURSES_API}/${courseId}/Quizzes`);
   return response.data;
 };
-
-
-
-// export const findQuizzes = async (courseId : string, qid : string) => {
-//   const response = await axios.get(`${COURSES_API}/${courseId}/quizzes/${qid}`);
-//   return response.data;
-// };
 
 export const findQuiz = async (courseId: string, qid: string) => { // Changed from findQuizzes to findQuiz
   try{  const response = await axios.get(`${COURSES_API}/${courseId}/Quizzes/${qid}`);
@@ -36,7 +29,16 @@ export const findQuiz = async (courseId: string, qid: string) => { // Changed fr
   }
  
 };
-export const updateQuiz = async (quiz : any) => {
+export const findQuizById = async (id: string) => {
+  const response = await axios.get(`${QUIZZES_API}/${id}`);
+  return response.data;
+};
+
+export const updateQuiz = async (quiz: any) => {
+  if (!quiz._id) {
+    throw new Error('Quiz ID is missing.');
+  }
+  console.log(`Updating quiz with ID: ${quiz._id}`);
   const response = await axios.put(`${QUIZZES_API}/${quiz._id}`, quiz);
   return response.data;
 };
