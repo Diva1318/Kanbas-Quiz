@@ -1,5 +1,5 @@
 // import { MdOutlineModeEditOutline } from 'react-icons/md'
-// import { Link, useParams } from 'react-router-dom'
+// import { Link, useParams, useNavigate } from 'react-router-dom'
 // import './index.css'
 // import * as client from '../client'
 // import { setQuizzes } from '../reducer'
@@ -7,10 +7,11 @@
 // import { useEffect, useState } from 'react'
 // import { format } from 'date-fns'
 // import { AiOutlineStop } from 'react-icons/ai'
-// import { FaPlus } from 'react-icons/fa6'
+// import { FaPlus, FaArrowLeft } from 'react-icons/fa6'
 
 // export default function QuizDetails () {
 //   const { cid, qid } = useParams()
+//   const navigate = useNavigate()
 //   const dispatch = useDispatch()
 //   const [loading, setLoading] = useState(true)
 //   const [error, setError] = useState<string | null>(null)
@@ -63,24 +64,30 @@
 //   const { currentUser } = useSelector((state: any) => state.accountReducer)
 //   console.log('USER ' + currentUser.role)
 
-//   if (loading) {
-//     return <div>Loading...</div>
-//   }
+//   // if (loading) {
+//   //   return <div>Loading...</div>
+//   // }
 
-//   if (error) {
-//     return <div>Error: {error}</div>
-//   }
+//   // if (error) {
+//   //   return <div>Error: {error}</div>
+//   // }
 
-//   if (!quiz) {
-//     return <div>No quiz found</div>
-//   }
+//   // if (!quiz) {
+//   //   return <div>No quiz found</div>
+//   // }
 
-//   if (!currentUser) {
-//     return <div>No user logged in</div>
-//   }
+//   // if (!currentUser) {
+//   //   return <div>No user logged in</div>
+//   // }
 
 //   return (
 //     <div id='wd-quizzes'>
+//       <button
+//         className='btn btn-secondary mb-3'
+//         onClick={() => navigate(`/Kanbas/Courses/${cid}/Quizzes/`)}
+//       >
+//         <FaArrowLeft /> Go Back
+//       </button>
 //       <div
 //         id='wd-quiz-control-buttons'
 //         className='text-nowrap align-self-center'
@@ -225,6 +232,7 @@ import { useEffect, useState } from 'react'
 import { format } from 'date-fns'
 import { AiOutlineStop } from 'react-icons/ai'
 import { FaPlus, FaArrowLeft } from 'react-icons/fa6'
+import { findAllQuestionsByQuizId } from '../QuestionClient'
 
 export default function QuizDetails () {
   const { cid, qid } = useParams()
@@ -232,6 +240,7 @@ export default function QuizDetails () {
   const dispatch = useDispatch()
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [totalPoints, setTotalPoints] = useState<number | null>(null) // State to store total points
 
   const fetchQuiz = async () => {
     try {
@@ -239,6 +248,12 @@ export default function QuizDetails () {
         const quiz = await client.findQuiz(cid as string, qid as string)
         console.log('Fetched quiz:', quiz) // Debug log
         dispatch(setQuizzes([quiz]))
+        const questions = await findAllQuestionsByQuizId(qid as string)
+        const points = questions.reduce(
+          (total: Number, question: any) => total + (question.points || 0),
+          0
+        )
+        setTotalPoints(points)
       }
     } catch (err: any) {
       setError(err.message)
@@ -281,21 +296,21 @@ export default function QuizDetails () {
   const { currentUser } = useSelector((state: any) => state.accountReducer)
   console.log('USER ' + currentUser.role)
 
-  // if (loading) {
-  //   return <div>Loading...</div>
-  // }
+  if (loading) {
+    return <div>Loading...</div>
+  }
 
-  // if (error) {
-  //   return <div>Error: {error}</div>
-  // }
+  if (error) {
+    return <div>Error: {error}</div>
+  }
 
-  // if (!quiz) {
-  //   return <div>No quiz found</div>
-  // }
+  if (!quiz) {
+    return <div>No quiz found</div>
+  }
 
-  // if (!currentUser) {
-  //   return <div>No user logged in</div>
-  // }
+  if (!currentUser) {
+    return <div>No user logged in</div>
+  }
 
   return (
     <div id='wd-quizzes'>
@@ -360,7 +375,8 @@ export default function QuizDetails () {
               </tr>
               <tr>
                 <th>Points</th>
-                <td>{quiz.points}</td>
+                <td>{totalPoints !== null ? totalPoints : quiz.points}</td>{' '}
+                {/* Display total points */}
               </tr>
               <tr>
                 <th>Assignment Group</th>
