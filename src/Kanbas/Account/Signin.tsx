@@ -292,7 +292,6 @@ import { useDispatch } from 'react-redux'
 import { setCurrentUser } from './reducer'
 import { Link, useNavigate } from 'react-router-dom'
 import * as client from './client'
-import './Signin.css' // Add a CSS file for additional styling
 
 export default function Signin () {
   const [error, setError] = useState('')
