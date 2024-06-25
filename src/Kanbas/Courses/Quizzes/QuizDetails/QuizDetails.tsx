@@ -282,6 +282,16 @@ export default function QuizDetails () {
     state.quizzesReducer.quizzes.find((q: any) => q._id === qid)
   )
 
+  const formatDateForInput = (dateString: string) => {
+    try {
+      const date = new Date(dateString)
+      const formattedDate = date.toISOString().slice(0, 16)
+      return formattedDate
+    } catch (error) {
+      console.error('Error formatting date for input:', error)
+      return dateString
+    }
+  }
   const formatDate = (dateString: string) => {
     try {
       const date = new Date(dateString)

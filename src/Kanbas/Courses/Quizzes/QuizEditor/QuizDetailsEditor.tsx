@@ -1383,7 +1383,8 @@ export default function QuizDetailsEditor () {
   const formatDateForInput = (dateString: string) => {
     try {
       const date = new Date(dateString)
-      return date.toISOString().slice(0, 16)
+      const formattedDate = date.toISOString().slice(0, 16)
+      return formattedDate
     } catch (error) {
       console.error('Error formatting date for input:', error)
       return dateString
@@ -1720,7 +1721,7 @@ export default function QuizDetailsEditor () {
                       type='datetime-local'
                       id='dueDate'
                       name='dueDate'
-                      value={quizDetails.dueDate}
+                      value={formatDateForInput(quizDetails.dueDate)}
                       onChange={handleChange}
                       className='form-control'
                     />
@@ -1737,7 +1738,7 @@ export default function QuizDetailsEditor () {
                       type='datetime-local'
                       id='availableDate'
                       name='availableDate'
-                      value={quizDetails.availableDate}
+                      value={formatDateForInput(quizDetails.availableDate)}
                       onChange={handleChange}
                       className='form-control'
                     />
@@ -1754,7 +1755,7 @@ export default function QuizDetailsEditor () {
                       type='datetime-local'
                       id='untilDate'
                       name='untilDate'
-                      value={quizDetails.untilDate}
+                      value={formatDateForInput(quizDetails.untilDate)}
                       onChange={handleChange}
                       className='form-control'
                     />
