@@ -7,6 +7,7 @@ import * as quizClient from './client'
 import { setQuestions as setQuestionsAction } from './QuestionsReducer'
 import { addAnswer, updateAnswer } from './AnswerReducer'
 import './style.css'
+import { current } from '@reduxjs/toolkit'
 
 interface Question {
   title: string
@@ -138,7 +139,6 @@ export default function QuizPreview () {
         incorrect.push(question._id)
         incorrectAns[question._id] = answers[question._id]
       }
-
       const answerData = {
         userId: currentUser?._id,
         quizId: qid as string,
@@ -148,6 +148,8 @@ export default function QuizPreview () {
         attemptNumber: submitCount + 1,
         submittedAt: new Date()
       }
+      console.log('Answer Data:', answerData)
+
       answerDataArray.push(answerData)
     })
 
@@ -159,15 +161,26 @@ export default function QuizPreview () {
             answerData.questionId
           )
           if (existingAnswer) {
-            await answerClient.updateAnswer(answerData)
+            console.log('Updating answers: ' + answerData)
+            await answerClient.updateAnswer(
+              answerData,
+              answerData.questionId,
+              currentUser._id
+            )
             dispatch(updateAnswer(answerData))
           } else {
-            await answerClient.createAnswer(qid as string, answerData as any)
+            await answerClient.createAnswer(
+              answerData.questionId as string,
+              answerData as any
+            )
             dispatch(addAnswer(answerData))
           }
         } catch (error: any) {
           if (error.response && error.response.status === 404) {
-            await answerClient.createAnswer(qid as string, answerData as any)
+            await answerClient.createAnswer(
+              answerData.questionId as string,
+              answerData as any
+            )
             dispatch(addAnswer(answerData))
           } else {
             console.error('Error processing answer:', error)

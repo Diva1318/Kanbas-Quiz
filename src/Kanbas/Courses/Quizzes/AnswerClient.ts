@@ -141,13 +141,13 @@ export const createAnswer = async (questionId: string, answer: any) => {
   
 };
 
-export const updateAnswer = async (answer: any) => {
-    if (!answer._id) {
-        throw new Error("Answer ID is missing!")
-    }
+export const updateAnswer = async (answer: any, questionId: string, userId: string) => {
+    // if (!answer._id) {
+    //     throw new Error("Answer ID is missing!")
+    // }
     try {
-    console.log("updating")
-    const response = await axios.put(`${ANSWERS_API}/${answer._id}`, answer);
+    console.log("updating: " + questionId + ", userId: " + userId)
+    const response = await axios.put(`${ANSWERS_API}/${userId}/${questionId}/stored`, answer);
     return response.data;
   } catch (error) {
     console.error('Error updating answer:', error);
