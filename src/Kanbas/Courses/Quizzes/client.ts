@@ -21,7 +21,8 @@ export const findQuizzesForCourse = async (courseId : string) => {
 };
 
 export const findQuiz = async (courseId: string, qid: string) => { // Changed from findQuizzes to findQuiz
-  try{  const response = await axios.get(`${COURSES_API}/${courseId}/Quizzes/${qid}`);
+  try {
+    const response = await axios.get(`${COURSES_API}/${courseId}/Quizzes/${qid}`);
     return response.data;
   } catch (error : any) {
         throw new Error('Error fetching quiz details: ' + error.message);
