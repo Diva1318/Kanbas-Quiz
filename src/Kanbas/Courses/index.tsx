@@ -15,6 +15,7 @@ import QuizPreviewScreen from './Quizzes/QuizPreviewScreen'
 import QuizDetails from './Quizzes/QuizDetails/QuizDetails'
 import Quiz from './Quizzes'
 import PeopleTable from './People/Table'
+import QuizResults from './Quizzes/QuizResults'
 
 export default function Courses ({ courses }: { courses: any[] }) {
   const { cid, qid } = useParams()
@@ -54,7 +55,7 @@ export default function Courses ({ courses }: { courses: any[] }) {
               path='/Quizzes/:qid/questions'
               element={<QuizPreviewScreen />}
             />
-
+            <Route path='/Quizzes/:qid/results' element={<QuizResults />} />
             <Route path='People' element={<PeopleTable />} />
             <Route path='People/:uid' element={<PeopleTable />} />
             <Route path='/Grades' element={<Grades />} />
